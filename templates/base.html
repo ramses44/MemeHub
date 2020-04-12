@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" type="text/css" href="../../static/css/main_css.css">
+        <link rel="stylesheet" type="text/css" href="../../static/css/base_css.css">
+        <title>MemeHub</title>
+    </head>
+    <body class="bg_style">
+        <ul class="navigation">
+            <li class="li_nav">
+                <a class="active li_a_nav" href="#main_page">
+                    <img class="li_a_nav img_nav" href="#home" src="../../static/img/img1.jpg">
+                </a>
+            </li>
+            <li class="li_nav"><a class="active li_a_nav" href="#main_page">Главная</a></li>
+            <li class="li_nav"><a class="li_a_nav" href="#my_page">Моя страница</a></li>
+            <li class="li_nav"><a class="li_a_nav" href="#search_page">Поиск</a></li>
+            <li class="li_nav"><a class="li_a_nav" href="#top_memes_page">Топ мемов</a></li>
+            <li class="li_nav"><a class="li_a_nav" href="#top_users_page">Топ пользователей</a></li>
+            <li class="li_nav_right"><a class="li_a_nav last_btn" href="#login_page">Вход</a></li>
+            <li class="li_nav_right"><a class="li_a_nav" href="#register_page">Регистрация</a></li>
+        </ul>
+        <div class="empty"></div>
+        {% block content %}{% endblock %}
+    </body>
+</html>

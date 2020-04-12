@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+{% for meme in data %}
+<div class="meme_block">
+    <div class="author">
+        <div class="test">
+            <a href="#author_page"><img src={{ meme["author_img"] }} class="author_img"></a>
+            <div class="author_name"><a href="#author_page">{{ meme["author_name"] }}</a></div>
+            <div class="meme_date">{{ meme["date"] }}</div>
+        </div>
+    </div>
+    <div class="note">{{ meme["note"] }}</div>
+    <img src={{ meme["meme_img"] }} class="meme_img">
+
+</div>
+{% endfor %}
+{% endblock %}
