@@ -1,10 +1,9 @@
+from data import db_session
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-
-__factory = None
+db_session.global_init("db/memehub.sqlite")
 
 
 @app.route('/', methods=['POST', 'GET'])
