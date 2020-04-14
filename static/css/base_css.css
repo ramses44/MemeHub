@@ -23,6 +23,16 @@
     float: right;
 }
 
+.li_nav_right_btn {
+    float: right;
+    margin-top: 15px;
+    margin-right: 10px;
+    font-family: "Gill Sans", sans-serif;
+    font-size: medium;
+    font-weight: bold;
+}
+
+
 .li_a_nav {
     display: block;
     color: white;
