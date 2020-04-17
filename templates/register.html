@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Авторизация</h1>
+<form method="post" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.email.label }}<br>
+        {{ form.email(class="form-control") }}<br>
+        {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(class="form-control") }}<br>
+        {% for error in form.password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.rep_password.label }}<br>
+        {{ form.rep_password(class="form-control") }}<br>
+        {% for error in form.rep_password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.alias.label }}<br>
+        {{ form.alias(class="form-control") }}<br>
+        {% for error in form.alias.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.bdate.label }}<br>
+        {{ form.bdate(class="form-control", type="date") }}<br>
+        {% for error in form.bdate.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.about.label }}<br>
+        {{ form.about(class="form-control", rows=5) }}<br>
+        {% for error in form.about.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.avatar.label }}
+        {{ form.avatar(class="input-group mb-3") }}
+        {% for error in form.avatar.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+
+    <p>{{ form.submit(type="submit", class="btn btn-outline-primary") }}</p>
+
+</form>
+
+{% endblock %}

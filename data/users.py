@@ -11,8 +11,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    login = sqlalchemy.Column(sqlalchemy.String,
-                              index=True, unique=True, nullable=False)
+    email = sqlalchemy.Column(sqlalchemy.String, unique=True, index=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     alias = sqlalchemy.Column(sqlalchemy.String, nullable=False)  # То, как пользователь подписан у других
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
