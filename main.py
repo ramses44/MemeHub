@@ -9,6 +9,26 @@ db_session.global_init("db/memehub.sqlite")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # в info информация о пользователе:
+    # is_auth авторизирован или нет
+    # user_img путь к аватарке пользователя
+    # username имя пользователя
+
+    # в content информация о мемах
+    # в type там может быть или 'meme' или 'repost'
+    # id номер публикации
+    # autor_name имя автора
+    # autor_img путь к аватарке автора
+    # date дата
+    # note подпись к публикации
+    # meme_img путь к мему
+    # likes/reposts количество лайков/репостов
+    # is_liked/is_reposted поставлен ли лайк/репост
+    # category категория
+    # place место в топе, если 0, то ничего не отображается
+    # delete наличие или отсутствие кнопки удаления
+
+    # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
     data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'},
             'content': [
                 {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
