@@ -20,6 +20,7 @@ def load_user(user_id):
     session = db_session.create_session()
     return session.query(User).get(user_id)
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # в info информация о пользователе:
@@ -76,8 +77,10 @@ def post():
         print(request.json)
     return 'return'
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -86,21 +89,22 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         flash("Неправильный логин или пароль")
-        return render_template('login.html', form=form, title='Авторизация', current_user=current_user)
-    return render_template('login.html', form=form, title='Авторизация', current_user=current_user)
+        return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=data)
+    return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.rep_password.data:
             flash("Пароли не совпадают")
-            return render_template('register.html', title='Регистрация', form=form, current_user=current_user)
+            return render_template('register.html', title='Регистрация', form=form, current_user=current_user, data=data)
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.email.data).first():
             flash("Этот e-mail уже используется!")
-            return render_template('register.html', title='Регистрация', form=form, current_user=current_user)
+            return render_template('register.html', title='Регистрация', form=form, current_user=current_user, data=data)
 
         if form.avatar.data:
             filename = secure_filename(form.avatar.data.filename)
@@ -119,7 +123,7 @@ def register():
         session.add(user)
         session.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form, current_user=current_user)
+    return render_template('register.html', title='Регистрация', form=form, current_user=current_user, data=data)
 
 
 @app.route('/logout')
