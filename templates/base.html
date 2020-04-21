@@ -8,21 +8,59 @@
         <title>MemeHub</title>
     </head>
     <body class="bg_style">
-        <ul class="navigation">
-            <li class="li_nav">
-                <a class="active li_a_nav" href="#main_page">
-                    <img class="li_a_nav img_nav" href="#home" src="../../static/img/img1.jpg">
-                </a>
-            </li>
-            <li class="li_nav"><a class="active li_a_nav" href="#main_page">Главная</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#my_page">Моя страница</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#search_page">Поиск</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#top_memes_page">Топ мемов</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#top_users_page">Топ пользователей</a></li>
-            <li class="li_nav_right"><a class="li_a_nav last_btn" href="#login_page">Вход</a></li>
-            <li class="li_nav_right"><a class="li_a_nav" href="#register_page">Регистрация</a></li>
-        </ul>
-        <div class="empty"></div>
-        {% block content %}{% endblock %}
+        <div class="navigation">
+            <div class="nav_block">
+                <div class="logo">MemeHub</div>
+                <div class="search_block">
+                    <div class="search_div">
+                        <input class="search" placeholder="Поиск" onkeypress="return SearchEnter(event)" id="search">
+                    </div>
+                </div>
+                {% if data['info']['is_auth'] %}
+                    <a class="nav_buttons nav_button1" href="/logout">Выйти</a>
+                {% else %}
+                    <a class="nav_buttons nav_button1" href="/login">Войти</a>
+                    <a class="nav_buttons nav_button2" href="/register">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="content_block">
+            <div class="left_block">
+                {% if data['info']['is_auth'] %}
+                    <div class="menu_block menu_block2">
+                        <div class="my_page" onClick="window.location='/author/{{ data['info']['username'] }}'">
+                            <div class="test">
+                                <a><img src="{{ data['info']['user_img'] }}" class="author_img"></a>
+                                <div class="author_name"><a>{{ data['info']['username'] }}</a></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="menu_block menu_block1">
+                    <div class="menu_section" onClick="window.location=''">Главная</div>
+                    {% if data['info']['is_auth'] %}
+                        <div class="menu_section" onClick="window.location='/author/{{ data['info']['username'] }}'">Моя страница</div>
+                    {% endif %}
+                    <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
+                    <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
+                </div>
+            </div>
+            <div class="center_block">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </body>
 </html>
+
+<script>
+    function SearchEnter(e) {
+    if (e.keyCode == 13) {
+        var tb = document.getElementById("search").value;
+        tb = tb.trim();
+        if (tb) {
+            window.location='/search/' + tb;
+        }
+        return false;
+    }
+    }
+</script>
