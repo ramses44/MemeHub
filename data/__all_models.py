@@ -42,3 +42,6 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Зарегистрироваться")
 
 
+class TagAddingForm(FlaskForm):
+    title = StringField('Тег (без "#")', validators=(DataRequired(), ))
+    submit = SubmitField("Добавить")
