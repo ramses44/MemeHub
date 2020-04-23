@@ -12,6 +12,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True, index=True, nullable=False)
+    role = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     alias = sqlalchemy.Column(sqlalchemy.String, nullable=False)  # То, как пользователь подписан у других
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
@@ -28,3 +29,5 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def __repr__(self):
         return f"<User> {self.id} {self.alias}"
+
+

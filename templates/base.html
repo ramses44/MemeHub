@@ -9,37 +9,62 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
-        <title>{{title}}</title>
+        <title>{{ title }}</title>
     </head>
     <body class="bg_style">
-    <header>
-        <ul class="navigation">
-            <li class="li_nav">
-                <a class="active li_a_nav" href="#main_page">
-                    <img class="li_a_nav img_nav" href="#home" src="../../static/img/img1.jpg">
-                </a>
-            </li>
-            <li class="li_nav"><a class="active li_a_nav" href="#main_page">Главная</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#search_page">Поиск</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#top_memes_page">Топ мемов</a></li>
-            <li class="li_nav"><a class="li_a_nav" href="#top_users_page">Топ пользователей</a></li>
-            {%  if current_user.is_authenticated %}
-                <li class="li_nav_right_btn"><a class="btn btn-outline-danger" href="/logout">Выход</a></li>
-                <li class="li_nav_right_btn"><a class="li_a_nav" href="#me">{{ current_user.alias }}</a></li>
-            {% else %}
-                <li class="li_nav_right_btn"><a class="btn btn-outline-success" href="/register">Регистрация</a></li>
-                <li class="li_nav_right_btn"><a class="btn btn-outline-primary" href="/login">Вход</a></li>
-            {% endif %}
-
-            <!--
-            <li class="button"><a class="btn btn-outline-primary" href="#login_page">Вход</a></li>
-            <li class="button"><a class="btn btn-outline-success" href="#register_page">Регистрация</a></li>
-            -->
-        </ul>
-    </header>
-
-    <main role="main" class="container-lg">
-        {% block content %}{% endblock %}
-    </main>
+        <div class="navigation">
+            <div class="nav_block">
+                <div class="logo">MemeHub</div>
+                <div class="search_block">
+                    <div class="search_div">
+                        <input class="search" placeholder="Поиск" onkeypress="return SearchEnter(event)" id="search">
+                    </div>
+                </div>
+                {% if data['info']['is_auth'] %}
+                    <a class="nav_buttons nav_button1" href="/logout">Выйти</a>
+                {% else %}
+                    <a class="nav_buttons nav_button1" href="/login">Войти</a>
+                    <a class="nav_buttons nav_button2" href="/register">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="content_block">
+            <div class="left_block">
+                {% if data['info']['is_auth'] %}
+                    <div class="menu_block menu_block2">
+                        <div class="my_page" onClick="window.location='/author/{{ data['info']['username'] }}'">
+                            <div class="test">
+                                <a><img src="{{ data['info']['user_img'] }}" class="author_img"></a>
+                                <div class="author_name"><a>{{ data['info']['username'] }}</a></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="menu_block menu_block1">
+                    <div class="menu_section" onClick="window.location='/'">Главная</div>
+                    {% if data['info']['is_auth'] %}
+                        <div class="menu_section" onClick="window.location='/author/{{ data['info']['username'] }}'">Моя страница</div>
+                    {% endif %}
+                    <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
+                    <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
+                </div>
+            </div>
+            <div class="center_block">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </body>
 </html>
+
+<script>
+    function SearchEnter(e) {
+    if (e.keyCode == 13) {
+        var tb = document.getElementById("search").value;
+        tb = tb.trim();
+        if (tb) {
+            window.location='/search/' + tb;
+        }
+        return false;
+    }
+    }
+</script>
