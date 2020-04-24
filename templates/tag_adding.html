@@ -2,11 +2,6 @@
 
 {% block content %}
     <div class="container">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="alert alert-success" role="alert">{{ messages[-1] }}</div>
-            {% endif %}
-        {% endwith %}
         <h1>Добавить тег</h1>
         <form method="post" novalidate>
             {{ form.hidden_tag() }}

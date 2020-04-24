@@ -5,10 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" type="text/css" href="../../static/css/main_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/base_css.css">
-        <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <title>{{ title }}</title>
     </head>
     <body class="bg_style">
@@ -32,10 +29,10 @@
             <div class="left_block">
                 {% if data['info']['is_auth'] %}
                     <div class="menu_block menu_block2">
-                        <div class="my_page" onClick="window.location='/author/{{ data['info']['username'] }}'">
+                        <div class="my_page" onClick="window.location='/author/{{ data['info']['id'] }}'">
                             <div class="test">
                                 <a><img src="{{ data['info']['user_img'] }}" class="author_img"></a>
-                                <div class="author_name"><a>{{ data['info']['username'] }}</a></div>
+                                <div class="author_name"><a>{{ data['info']['alias'] }}</a></div>
                             </div>
                         </div>
                     </div>
@@ -43,13 +40,20 @@
                 <div class="menu_block menu_block1">
                     <div class="menu_section" onClick="window.location='/'">Главная</div>
                     {% if data['info']['is_auth'] %}
-                        <div class="menu_section" onClick="window.location='/author/{{ data['info']['username'] }}'">Моя страница</div>
+                        <div class="menu_section" onClick="window.location='/author/{{ data['info']['id'] }}'">Моя страница</div>
                     {% endif %}
                     <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
                     <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
                 </div>
             </div>
             <div class="center_block">
+                <div class="container">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert alert-success" role="alert">{{ messages[-1] }}</div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
                 {% block content %}{% endblock %}
             </div>
         </div>

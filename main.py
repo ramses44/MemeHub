@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 from data.__all_models import *
 from data.users import User
+from data.memes import Meme
 from flask_login import login_user, logout_user, current_user, login_required, LoginManager
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
@@ -9,9 +10,10 @@ from auxiliary import avatar_convert
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
+from datetime import datetime
 
 ROLES = ['user', 'moder', 'admin']
-DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'},
+DATA = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'id': 1, 'alias': 'User'},
         'content': [
             {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
              'date': '01.01.2020',
@@ -55,7 +57,8 @@ def index():
     # в info информация о пользователе:
     # is_auth авторизирован или нет
     # user_img путь к аватарке пользователя
-    # username имя пользователя
+    # id пользователя
+    # alias имя пользователя
 
     # в content информация о мемах
     # в type там может быть или 'meme' или 'repost'
@@ -125,8 +128,9 @@ def register():
         if form.avatar.data:
             # Если загружена аватарка, обрабатываем и сохраняем её
             filename = secure_filename(form.avatar.data.filename)
-            form.avatar.data.save('images/avatars/' + form.alias.data + "_" + filename)
-            fn = form.alias.data + "_" + filename
+            form.avatar.data.save('images/avatars/' +
+                                  str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:])
+            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
             try:
                 avatar_convert.convert('images/avatars/' + fn)
             except FileNotFoundError:
@@ -188,6 +192,63 @@ def addtag():
     else:
         # GET-запрос
         return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=DATA)
+
+
+@app.route('/addmeme', methods=['POST', 'GET'])
+def addmeme():
+    """Механизм добавления мема"""
+
+    form = MemeAddingForm()
+
+    if not current_user.is_authenticated:
+        # Если пользователь не вошёл в систему, кидаем ошибку
+        abort(401, message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
+
+    ses = db_session.create_session()
+    tags = [(t.id, t.title) for t in ses.query(Tag).all()]
+
+    if form.validate_on_submit():
+        # Если POST-запрос
+
+        if len(request.form.getlist('tags')) > 5:
+            # Проверяем, сколько тегов добавил пользователь
+            flash("Слишком много тегов! Их должно быть не больше 5")
+            return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+
+        # Сохраняем картинку
+        filename = secure_filename(form.picture.data.filename)
+        form.picture.data.save('images/memes/' +
+                               str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:])
+        fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+
+        # Создаём мем
+        meme = Meme(
+            title=form.title.data,
+            tags=[ses.query(Tag).get(t) for t in request.form.getlist('tags')],
+            author=current_user.get_id(),
+            picture=fn
+        )
+
+        # Сохраняем
+        ses.add(meme)
+        ses.commit()
+
+        return redirect('/me')  # Возвращаем пользователя на свою страницу
+
+    # GET-запрос
+    return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+
+
+@app.route('/me')
+def get_my_profile():
+    """Функция для переадресации пользователя на собственную страницу автора"""
+
+    if not current_user.is_authenticated:
+        # Если пользователь не авторизован, то перенаправляем на главную
+        return redirect('/')
+    else:
+        # Иначе, направляем его на свою страничку
+        return redirect(f'/author/{current_user.get_id()}')
 
 
 if __name__ == '__main__':

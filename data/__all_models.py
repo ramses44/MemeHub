@@ -1,6 +1,6 @@
 import sqlalchemy
 from .db_session import SqlAlchemyBase
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, validators
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, validators, FieldList
 from flask_wtf.file import FileField, FileAllowed
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
@@ -44,4 +44,10 @@ class RegisterForm(FlaskForm):
 
 class TagAddingForm(FlaskForm):
     title = StringField('Тег (без "#")', validators=(DataRequired(), ))
+    submit = SubmitField("Добавить")
+
+
+class MemeAddingForm(FlaskForm):
+    title = StringField("Заголовок", validators=[DataRequired()])
+    picture = FileField("Загрузите мем", validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField("Добавить")
