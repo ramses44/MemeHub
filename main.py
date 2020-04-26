@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, make_response
 from data.__all_models import *
 from data.users import User
 from data.memes import Meme
@@ -6,14 +6,16 @@ from flask_login import login_user, logout_user, current_user, login_required, L
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
-from auxiliary import avatar_convert
+from auxiliary import avatar_convert, meme_selector
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
 from datetime import datetime
+from gen_api import *
+import requests
 
-ROLES = ['user', 'moder', 'admin']
-DATA = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'id': 1, 'alias': 'User'},
+
+DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'id': 1, 'alias': 'User', 'role': 'admin'},
         'content': [
             {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
              'date': '01.01.2020',
@@ -42,8 +44,25 @@ DATA = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'id'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/memehub.sqlite")
+app.register_blueprint(blueprint)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+def gen_data():
+    """Функция для генерации данных для подгрузки темплейта"""
+
+    # В зависимости от того, авторизован ли пользователь, генерируем данные
+    if current_user.is_authenticated:
+        info = generate_user_info(current_user.get_id())
+        res = get_content(uid=current_user.get_id(), by_server=True)
+    else:
+        info = dict(is_auth=False)
+        res = get_content(by_server=True)
+
+    res['info'] = info  # Совмещаем данные в один словарь
+
+    return res  # Возвращаем его
 
 
 @login_manager.user_loader
@@ -75,7 +94,7 @@ def index():
     # delete наличие или отсутствие кнопки удаления
 
     # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
-    data = DATA
+    data = gen_data()
     return render_template('main.html', data=data, title='Главная')
 
 
@@ -128,11 +147,10 @@ def register():
         if form.avatar.data:
             # Если загружена аватарка, обрабатываем и сохраняем её
             filename = secure_filename(form.avatar.data.filename)
-            form.avatar.data.save('images/avatars/' +
-                                  str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:])
             fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+            form.avatar.data.save('static/img/avatars/' + fn)
             try:
-                avatar_convert.convert('images/avatars/' + fn)
+                avatar_convert.convert('static/img/avatars/' + fn)
             except FileNotFoundError:
                 fn = None
 
@@ -217,9 +235,8 @@ def addmeme():
 
         # Сохраняем картинку
         filename = secure_filename(form.picture.data.filename)
-        form.picture.data.save('images/memes/' +
-                               str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:])
         fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+        form.picture.data.save('static/img/avatars' + fn)
 
         # Создаём мем
         meme = Meme(

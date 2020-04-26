@@ -3,6 +3,7 @@ from data.users import User
 from data.memes import Meme
 from data.tags import Tag
 
+TOP_LEN = 5
 LIKED_MEMES_BASIS = 15
 LAST_MEMES_COUNT = 50
 TAPE_SIZE = 20
@@ -65,6 +66,13 @@ def get_tape(uid, k=0):  # k - возвращённое ранее значен�
             k += 1
 
     return tape, k
+
+
+def get_most_popular():
+    """Функция для получения списка самых популярных мемов"""
+
+    ses = create_session()
+    return sorted(ses.query(Meme), key=lambda x: len(list(x.likes)), reverse=True)[:TOP_LEN]
 
 
 if __name__ == '__main__':
