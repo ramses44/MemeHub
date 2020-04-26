@@ -43,7 +43,7 @@ def index():
     # delete наличие или отсутствие кнопки удаления
 
     # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
-    data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'},
+    data = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'username': 'User'},
             'content': [
                 {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
                  'date': '01.01.2020',
@@ -80,7 +80,7 @@ def post():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
+    data = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -95,7 +95,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    data = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
+    data = {'info': {'is_auth': False, 'user_img': '../../static/img/img1.jpg', 'username': 'User'}}
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.rep_password.data:

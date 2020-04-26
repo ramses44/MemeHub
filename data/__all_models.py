@@ -37,8 +37,6 @@ class RegisterForm(FlaskForm):
     rep_password = PasswordField('Повтор пароля', validators=[DataRequired()])
     alias = StringField('Псевдоним', validators=[DataRequired()])
     bdate = DateField("Дата рождения", validators=(validators.Optional(),))
-    about = StringField("Немного о себе, если хотите))")
+    about = StringField("Немного о себе")
     avatar = FileField("Изображение профиля", validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField("Зарегистрироваться")
-
-

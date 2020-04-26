@@ -1,32 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Авторизация</h1>
-<form action="" method="post" novalidate>
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(class="form-control") }}<br>
-        {% for error in form.email.errors %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
+<div class="meme_block fixed_block">
+    <div class="auth_note">Авторизация</div>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            <div class="input_block">
+                <div class="label_note">
+                    {{ form.email.label }}
+                </div>
+                <div class="search_div_div">
+                    <div class="search_div_n">
+                        {{ form.email(class="form-control search") }}
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </p>
-
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(class="form-control") }}<br>
-        {% for error in form.password.errors %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
+                {% for error in form.email.errors %}
+                    <div class="input_block">
+                        <div class="error_note">
+                            {{ error }}
+                        </div>
+                    </div>
+                {% endfor %}
+        </p>
+        <p>
+            <div class="input_block">
+                <div class="label_note">
+                    {{ form.password.label }}
+                </div>
+                <div class="search_div_div">
+                    <div class="search_div_n">
+                        {{ form.password(class="form-control search") }}
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </p>
-
-    <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-    <p>{{ form.submit(type="submit", class="btn btn-outline-primary") }}</p>
-
-</form>
-
+                {% for error in form.password.errors %}
+                    <div class="input_block">
+                        <div class="error_note">
+                            {{ error }}
+                        </div>
+                    </div>
+                {% endfor %}
+        </p>
+        <p>
+            <div class="input_block2">
+                <div class="remember_button">
+                    {{ form.remember_me() }}
+                </div>
+                <div class="label_note remember_note">
+                    {{ form.remember_me.label }}
+                </div>
+            </div>
+        </p>
+        <p>{{ form.submit(type="submit", class="login_button") }}</p>
+    </form>
+</div>
 {% endblock %}
