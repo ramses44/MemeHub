@@ -12,7 +12,6 @@ from flask_restful import abort
 from data.tags import Tag
 from datetime import datetime
 from gen_api import *
-import requests
 
 
 DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'id': 1, 'alias': 'User', 'role': 'admin'},
