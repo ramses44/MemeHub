@@ -24,6 +24,9 @@ class Meme(SqlAlchemyBase, SerializerMixin):
     def __eq__(self, other):
         return self.id == other.id
 
+    def __hash__(self):
+        return hash(str(self.id) + 'm')
+
 
 class Repost(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'reposts'
@@ -36,3 +39,8 @@ class Repost(SqlAlchemyBase, SerializerMixin):
     user_ = orm.relation("User", foreign_keys=[user])
     publication_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False, default=datetime.datetime.now)
 
+    def __hash__(self):
+        return hash(str(self.id) + 'r')
+
+    def __repr__(self):
+        return "<Repost> " + self.title + f" //{self.meme_}\\\\"

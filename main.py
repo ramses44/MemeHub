@@ -71,6 +71,25 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
+@app.route('/subscribe/<int:uid>')
+def subscribe(uid):
+    """Ф-ия для подписки на пользователя, id которого передан"""
+
+    if not current_user.is_authenticated:
+        abort(401, message="Вы не авторизованы!")
+    else:
+        ses = db_session.create_session()
+
+        u1 = ses.query(User).get(current_user.get_id())
+        u2 = ses.query(User).get(uid)
+        u1.subscribed.append(u2)
+        u2.subscribers.append(u1)
+
+        ses.commit()
+
+        return redirect('#')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # в info информация о пользователе:
