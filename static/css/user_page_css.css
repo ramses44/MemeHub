@@ -154,6 +154,16 @@
     transition: all 0.6s ease;
 }
 
+.up_img_other {
+    width: 200px;
+    height: 200px;
+    border-radius: 2px;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+}
+
 .up_img_text {
     width: 200px;
     height: 200px;

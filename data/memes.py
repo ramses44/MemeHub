@@ -10,13 +10,13 @@ class Meme(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     author = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    author_ = orm.relation("User", foreign_keys=[author])
+    author_ = orm.relation("User", foreign_keys=[author], lazy='subquery')
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False, default="")
     publication_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False, default=datetime.datetime.now)
     tags = orm.relation('Tag', secondary='tags_to_memes', backref='meme', lazy='dynamic')
     likes = orm.relation('User', secondary='likes', backref='meme', lazy='dynamic')
     picture = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    repostes = orm.relation('Repost', back_populates='meme_')
+    repostes = orm.relation('Repost', back_populates='meme_', lazy='subquery')
 
     def __repr__(self):
         return "<Meme> " + self.title
@@ -35,4 +35,3 @@ class Repost(SqlAlchemyBase, SerializerMixin):
     user = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user_ = orm.relation("User", foreign_keys=[user])
     publication_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False, default=datetime.datetime.now)
-

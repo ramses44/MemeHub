@@ -75,6 +75,13 @@ def get_most_popular():
     return sorted(ses.query(Meme), key=lambda x: len(list(x.likes)), reverse=True)[:TOP_LEN]
 
 
+def get_user_memes(user_id):
+    """Функция для получения списка мемов пользователя"""
+    session = create_session()
+    memes = session.query(Meme).filter(Meme.author.like(user_id)).all()
+    return memes
+
+
 if __name__ == '__main__':
     global_init('../db/memehub.sqlite')
     print(

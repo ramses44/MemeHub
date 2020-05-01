@@ -15,13 +15,13 @@ from gen_api import *
 import requests
 
 ROLES = ['user', 'moder', 'admin']
+USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
+             'status': 'users_status',
+             'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
+             'error_message': '',
+             'is_sub': True, 'is_block': False}
 DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User', 'user_id': 45,
                  'admin': False},
-        'user_page': {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
-                      'status': 'users_status',
-                      'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
-                      'error_message': '',
-                      'is_sub': True, 'is_block': False},
         'content': [
             {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
              'date': '01.01.2020',
@@ -47,7 +47,29 @@ DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'user
                                                         'place': 0, 'delete': False}}]
         }
 
-# USER_PAGE в DATA
+# в info информация о пользователе:
+# is_auth авторизирован или нет
+# user_img путь к аватарке пользователя
+# username имя пользователя
+
+# в content информация о мемах
+# в type там может быть или 'meme' или 'repost'
+# id номер публикации
+# autor_name имя автора
+# autor_img путь к аватарке автора
+# date дата
+# note подпись к публикации
+# meme_img путь к мему
+# likes/reposts количество лайков/репостов
+# is_liked/is_reposted поставлен ли лайк/репост
+# category категория
+# place место в топе, если 0, то ничего не отображается
+# delete наличие или отсутствие кнопки удаления
+
+# если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
+
+
+# USER_PAGE
 # is_page   True/False показвать блок со страницей пользователя или нет
 # user_img  путь к аве пользователя
 # type  me/other, отображает страницу как личную или как чужую
@@ -84,6 +106,18 @@ def gen_data():
     return res  # Возвращаем его
 
 
+def get_user_page_data(username_id):
+    session = db_session.create_session()
+    user = session.query(User).filter(User.id == username_id).first()
+    data = user.get_data()
+    data['user_img'] = '../../static/img/avatars/' + data['user_img']
+    if str(current_user.id) == str(username_id):
+        data['type'] = 'me'
+    else:
+        data['type'] = 'other'
+    return data
+
+
 @login_manager.user_loader
 def load_user(user_id):
     session = db_session.create_session()
@@ -92,33 +126,76 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # в info информация о пользователе:
-    # is_auth авторизирован или нет
-    # user_img путь к аватарке пользователя
-    # username имя пользователя
-
-    # в content информация о мемах
-    # в type там может быть или 'meme' или 'repost'
-    # id номер публикации
-    # autor_name имя автора
-    # autor_img путь к аватарке автора
-    # date дата
-    # note подпись к публикации
-    # meme_img путь к мему
-    # likes/reposts количество лайков/репостов
-    # is_liked/is_reposted поставлен ли лайк/репост
-    # category категория
-    # place место в топе, если 0, то ничего не отображается
-    # delete наличие или отсутствие кнопки удаления
-
-    # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
+    """Главная страница"""
     data = gen_data()
+    # data = DATA
+    data['user_page'] = dict()
     data['user_page']['is_page'] = False
+    print(data)
     return render_template('main.html', data=data, title='Главная')
+
+
+@app.route('/post', methods=['POST'])
+def post():
+    """Функция для обработки запросов лайков, репостов, и тд."""
+    # в request.json
+    # type - тип действия like repost delete sub unsub block unblock
+    # user_id - id пользователя
+    # target_id - id мема, который лайкнули/репостнули/удалили
+    # или id пользователя, на которого подписались/отписались
+    # или id пользователя, которого заблокировали/разблокировали
+    if request:
+        print(request.json)
+    return 'qwerty'
+
+
+@app.route('/author/<username_id>', methods=['GET', 'POST'])
+def user_page(username_id):
+    """Cтраница пользователя"""
+    form = EditProfileForm()
+    error_message = ''
+    if form.validate_on_submit():
+        # обработка изменений профиля
+        session = db_session.create_session()
+        user = session.query(User).filter(User.id == current_user.get_id()).first()
+
+        if form.alias.data != user.alias:  # обработка изменений имени пользователя
+            if form.alias.data == '':
+                error_message = 'Такое имя пользователя недопустимо'
+            else:
+                if form.alias.data in [i.alias for i in session.query(User).all()]:
+                    error_message = 'Такое имя пользователя уже существует'
+                else:
+                    user.alias = form.alias.data
+
+        if form.about.data != user.about:  # обработка изменений статуса
+            user.about = form.about.data
+
+        if form.avatar.data:  # обработка изменений аватарки
+            filename = secure_filename(form.avatar.data.filename)
+            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+            form.avatar.data.save('static/img/avatars/' + fn)
+            try:
+                avatar_convert.convert('static/img/avatars/' + fn)
+            except FileNotFoundError:
+                fn = None
+        else:
+            fn = None
+        if fn is not None:
+            user.avatar = fn
+
+        session.commit()
+    data = gen_data()
+    data['user_page'] = get_user_page_data(username_id)
+    data['user_page']['error_message'] = error_message
+    print(data)
+    return render_template('main.html', data=data, title=data['user_page']['username'], form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Механизм авторизации пользователя"""
+    data = {'info': {'is_auth': False}}
     form = LoginForm()
     if form.validate_on_submit():
         # Если нажата кнопка (POST-запрос)
@@ -130,15 +207,16 @@ def login():
             return redirect("/")
         # Иначе кидаем ошибку
         flash("Неправильный логин или пароль")
-        return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=DATA)
+        return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=data)
     # Если GET-запрос
     # Просто выводим страницу авторизации
-    return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=DATA)
+    return render_template('login.html', form=form, title='Авторизация', current_user=current_user, data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Механизм регистрации пользователя"""
+    data = {'info': {'is_auth': False}}
     form = RegisterForm()
     if form.validate_on_submit():
         # Если кнопка нажата (POST-запрос)
@@ -146,14 +224,14 @@ def register():
             # Если пароли не совпадают, сообщаем пользователю
             flash("Пароли не совпадают")
             return render_template('register.html', title='Регистрация', form=form, current_user=current_user,
-                                   data=DATA)
+                                   data=data)
 
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.email.data).first():
             # Если e-mail уже занят, сообщаем пользователю
             flash("Этот e-mail уже используется!")
             return render_template('register.html', title='Регистрация', form=form, current_user=current_user,
-                                   data=DATA)
+                                   data=data)
 
         if form.avatar.data:
             # Если загружена аватарка, обрабатываем и сохраняем её
@@ -184,7 +262,7 @@ def register():
         # Сохраняем изменения
         session.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form, current_user=current_user, data=DATA)
+    return render_template('register.html', title='Регистрация', form=form, current_user=current_user, data=data)
 
 
 @app.route('/logout')

@@ -25,7 +25,7 @@ def generate_user_info(uid):
 
 
 @blueprint.route('/get_content/<int:uid>')
-def get_content(uid=0, by_server=False):
+def get_content(uid=0, by_server=False, ):
     """Функция для AJAX запроса по кнопке "Загрузить ещё"
     Если пользователь авторизован, нужно передавать его id,
     иначе uid=0 - это анонимный пользователь
@@ -67,12 +67,3 @@ def get_content(uid=0, by_server=False):
         res = dict(content=content)
 
     return res  # Возвращаем ответ
-
-
-
-
-
-
-
-
-
