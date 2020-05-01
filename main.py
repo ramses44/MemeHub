@@ -1,16 +1,18 @@
-import datetime
-
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, make_response
 from data.__all_models import *
 from data.users import User
+from data.memes import Meme
 from flask_login import login_user, logout_user, current_user, login_required, LoginManager
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
-from auxiliary import avatar_convert
+from auxiliary import avatar_convert, meme_selector
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
+from datetime import datetime
+from gen_api import *
+import requests
 
 ROLES = ['user', 'moder', 'admin']
 DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User', 'user_id': 45,
@@ -57,11 +59,29 @@ DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'user
 # error_message сообщение об ошибке(если возникла ошибка при редактировании профиля)
 # is_sub is_block нажата или не нажата кнопка подписки/блокировки
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/memehub.sqlite")
+app.register_blueprint(blueprint)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+def gen_data():
+    """Функция для генерации данных для подгрузки темплейта"""
+
+    # В зависимости от того, авторизован ли пользователь, генерируем данные
+    if current_user.is_authenticated:
+        info = generate_user_info(current_user.get_id())
+        res = get_content(uid=current_user.get_id(), by_server=True)
+    else:
+        info = dict(is_auth=False)
+        res = get_content(by_server=True)
+
+    res['info'] = info  # Совмещаем данные в один словарь
+
+    return res  # Возвращаем его
 
 
 @login_manager.user_loader
@@ -92,35 +112,9 @@ def index():
     # delete наличие или отсутствие кнопки удаления
 
     # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
-    data = DATA
+    data = gen_data()
     data['user_page']['is_page'] = False
     return render_template('main.html', data=data, title='Главная')
-
-
-@app.route('/author/<username>', methods=['GET', 'POST'])
-def user_page(username):
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        print('form-form-form')
-        print(form.alias.data)
-        print(form.about.data)
-        print(form.avatar.data)
-        data = DATA
-        data['user_page']['username'] = form.alias.data
-        data['user_page']['status'] = form.about.data
-    else:
-        data = DATA
-    data['user_page']['is_page'] = True
-    return render_template('main.html', data=data, title=username, form=form)
-
-
-@app.route('/post', methods=['POST'])
-def post():
-    print('post-post-post')
-    if request:
-        print(request.json)
-    return 'return'
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -164,10 +158,10 @@ def register():
         if form.avatar.data:
             # Если загружена аватарка, обрабатываем и сохраняем её
             filename = secure_filename(form.avatar.data.filename)
-            form.avatar.data.save('images/avatars/' + form.alias.data + "_" + filename)
-            fn = form.alias.data + "_" + filename
+            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+            form.avatar.data.save('static/img/avatars/' + fn)
             try:
-                avatar_convert.convert('images/avatars/' + fn)
+                avatar_convert.convert('static/img/avatars/' + fn)
             except FileNotFoundError:
                 fn = None
 
@@ -227,6 +221,62 @@ def addtag():
     else:
         # GET-запрос
         return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=DATA)
+
+
+@app.route('/addmeme', methods=['POST', 'GET'])
+def addmeme():
+    """Механизм добавления мема"""
+
+    form = MemeAddingForm()
+
+    if not current_user.is_authenticated:
+        # Если пользователь не вошёл в систему, кидаем ошибку
+        abort(401, message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
+
+    ses = db_session.create_session()
+    tags = [(t.id, t.title) for t in ses.query(Tag).all()]
+
+    if form.validate_on_submit():
+        # Если POST-запрос
+
+        if len(request.form.getlist('tags')) > 5:
+            # Проверяем, сколько тегов добавил пользователь
+            flash("Слишком много тегов! Их должно быть не больше 5")
+            return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+
+        # Сохраняем картинку
+        filename = secure_filename(form.picture.data.filename)
+        fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+        form.picture.data.save('static/img/avatars' + fn)
+
+        # Создаём мем
+        meme = Meme(
+            title=form.title.data,
+            tags=[ses.query(Tag).get(t) for t in request.form.getlist('tags')],
+            author=current_user.get_id(),
+            picture=fn
+        )
+
+        # Сохраняем
+        ses.add(meme)
+        ses.commit()
+
+        return redirect('/me')  # Возвращаем пользователя на свою страницу
+
+    # GET-запрос
+    return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+
+
+@app.route('/me')
+def get_my_profile():
+    """Функция для переадресации пользователя на собственную страницу автора"""
+
+    if not current_user.is_authenticated:
+        # Если пользователь не авторизован, то перенаправляем на главную
+        return redirect('/')
+    else:
+        # Иначе, направляем его на свою страничку
+        return redirect(f'/author/{current_user.get_id()}')
 
 
 if __name__ == '__main__':

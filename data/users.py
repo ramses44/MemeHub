@@ -20,6 +20,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     memes = orm.relation("Meme", back_populates='author_')
     avatar = sqlalchemy.Column(sqlalchemy.String, default='default.png')
     liked = orm.relation("Meme", secondary='likes', backref='user', lazy='dynamic')
+    reposted = orm.relation("Meme", secondary='reposts', backref='user_', lazy='dynamic')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
