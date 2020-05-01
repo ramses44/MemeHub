@@ -1,5 +1,104 @@
 {% extends "base.html" %}
 {% block content %}
+
+
+{% if data['user_page']['is_page'] %}
+
+<div class="meme_block">
+    <form method="post" novalidate enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        {% if data['user_page']['error_message'] %}
+            <div class="error_message">{{ data['user_page']['error_message'] }}</div>
+        {% endif %}
+        <div class="head_block">
+            <div class="img_sub_block">
+                <div class="img_block">
+                    <div class="up_img_text" onclick="document.getElementById('img-input').click()">Обновить фотографию</div>
+                    <img src="{{ data['user_page']['user_img'] }}" class="up_img">
+                </div>
+                <div class="sub_block">
+                    {% if data['user_page']['type'] != 'me' %}
+                        {% if data['user_page']['is_sub'] %}
+                            <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы подписаны</div>
+                        {% else %}
+                            <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">Подписаться</div>
+                        {% endif %}
+                    {% endif %}
+                    {% if data['info']['admin'] %}
+                        {% if data['user_page']['is_block'] %}
+                            <div class="sub_button block_button_true" id="block-button" onclick="block_click()">Разблокировать</div>
+                        {% else %}
+                            <div class="sub_button block_button_false" id="block-button" onclick="block_click()">Заблокировать</div>
+                        {% endif %}
+                    {% endif %}
+                    {% if data['user_page']['type'] == 'me' or not data['info']['admin'] %}
+                        <style type="text/css">
+                            .head_block {
+                                height: 236px;
+                            }
+                        </style>
+                    {% endif %}
+                    {% if data['user_page']['type'] == 'me' and not data['info']['admin'] %}
+                        <style type="text/css">
+                            .head_block {
+                                height: 200px;
+                            }
+                        </style>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="username_block">
+                <div class="up_role">
+                    {% if data['user_page']['role'] %}
+                        <div class="admin_role">{{ data['user_page']['role'] }}</div>
+                    {% endif %}
+                </div>
+                {% if data['user_page']['type'] == 'me' %}
+                    <div class="up_text_block up_username_div">
+                        {{ form.alias(value=data['user_page']['username'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_username", autocomplete="off") }}
+                    </div>
+                    <div class="up_text_block up_status_div">
+                        {{ form.about(rows=5, value=data['user_page']['status'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_status up_text_block_input2", autocomplete="off") }}
+                    </div>
+                {% else %}
+                    <div class="up_text_block_other up_username_div_other">
+                        <div class="up_text_block_input_other up_username_other">{{ data['user_page']['username'] }}</div>
+                    </div>
+                    <div class="up_text_block_other up_status_div_other">
+                        <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ data['user_page']['status'] }}</div>
+                    </div>
+                {% endif %}
+                <div class="info_block">
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Подписчики</div>
+                        <div class="up_data_block_part2" id="subs-number">{{ data['user_page']['subs'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Публикации</div>
+                        <div class="up_data_block_part2">{{ data['user_page']['posts'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Рейтинг</div>
+                        <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Место в топе</div>
+                        <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click()", style="display: none;") }}
+        </div>
+
+        <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
+    </form>
+</div>
+
+{% endif %}
+
 {% for meme in data['content'] %}
 <div class="meme_block" id="meme_block_{{ meme['id'] }}">
     {% if meme['place'] %}
@@ -147,8 +246,44 @@
                 document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) - 1;
             }
         }
+
         function deleteMeme(meme_id) {
             document.getElementById(meme_id).remove();
         }
+
+        function sub_click(){
+            if (document.getElementById("sub-button").innerHTML == "Вы подписаны") {
+                document.getElementById("sub-button").innerHTML = "Подписаться";
+                document.getElementById("sub-button").classList.remove("sub_button_true");
+                document.getElementById("sub-button").classList.add("sub_button_false");
+                document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) - 1;
+                post("/post", "{\"sub_user_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\", \"action\":\"unsub\"}");
+            }
+            else
+            {
+                document.getElementById("sub-button").innerHTML = "Вы подписаны";
+                document.getElementById("sub-button").classList.remove("sub_button_false");
+                document.getElementById("sub-button").classList.add("sub_button_true");
+                document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) + 1;
+                post("/post", "{\"sub_user_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\", \"action\":\"sub\"}");
+            }
+        }
+
+        function block_click(){
+            if (document.getElementById("block-button").innerHTML == "Разблокировать") {
+                document.getElementById("block-button").innerHTML = "Заблокировать";
+                document.getElementById("block-button").classList.remove("block_button_true");
+                document.getElementById("block-button").classList.add("block_button_false");
+                post("/post", "{\"block_user_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\", \"action\":\"unblock\"}");
+            }
+            else
+            {
+                document.getElementById("block-button").innerHTML = "Разблокировать";
+                document.getElementById("block-button").classList.remove("block_button_false");
+                document.getElementById("block-button").classList.add("block_button_true");
+                post("/post", "{\"block_user_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\", \"action\":\"block\"}");
+            }
+        }
+
 </script>
 {% endblock %}

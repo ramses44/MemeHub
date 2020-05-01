@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="meme_block fixed_block">
-    <div class="auth_note">Регистрация</div>
+    <div class="auth_note_reg_log">Регистрация</div>
     <form method="post" novalidate enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <p>
@@ -12,7 +12,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.email(class="form-control  search") }}
+                        {{ form.email(class="search") }}
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.password(class="form-control search") }}
+                        {{ form.password(class="search") }}
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.rep_password(class="form-control search") }}
+                        {{ form.rep_password(class="search") }}
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                  </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.alias(class="form-control search") }}
+                        {{ form.alias(class="search") }}
                     </div>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.bdate(class="form-control search", type="date") }}
+                        {{ form.bdate(class="search", type="date") }}
                     </div>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.about(class="form-control search", rows=5) }}
+                        {{ form.about(class="search", rows=5) }}
                     </div>
                 </div>
             </div>

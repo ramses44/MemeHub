@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="meme_block fixed_block">
-    <div class="auth_note">Авторизация</div>
+    <div class="auth_note_reg_log">Авторизация</div>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -13,7 +13,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.email(class="form-control search") }}
+                        {{ form.email(class="search") }}
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="search_div_div">
                     <div class="search_div_n">
-                        {{ form.password(class="form-control search") }}
+                        {{ form.password(class="search") }}
                     </div>
                 </div>
             </div>
@@ -58,3 +58,4 @@
     </form>
 </div>
 
+{% endblock %}

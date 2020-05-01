@@ -45,3 +45,11 @@ class RegisterForm(FlaskForm):
 class TagAddingForm(FlaskForm):
     title = StringField('Тег (без "#")', validators=(DataRequired(),))
     submit = SubmitField("Добавить")
+
+
+class EditProfileForm(FlaskForm):
+    alias = StringField('Псевдоним')
+    bdate = DateField("Дата рождения", validators=(validators.Optional(),))
+    about = StringField("Немного о себе")
+    avatar = FileField("Изображение профиля", validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
+    submit = SubmitField("Зарегистрироваться")

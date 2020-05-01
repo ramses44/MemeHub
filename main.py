@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, render_template, request, redirect, flash, url_for
 from data.__all_models import *
 from data.users import User
@@ -11,7 +13,13 @@ from flask_restful import abort
 from data.tags import Tag
 
 ROLES = ['user', 'moder', 'admin']
-DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User'},
+DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User', 'user_id': 45,
+                 'admin': False},
+        'user_page': {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
+                      'status': 'users_status',
+                      'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
+                      'error_message': '',
+                      'is_sub': True, 'is_block': False},
         'content': [
             {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
              'date': '01.01.2020',
@@ -36,6 +44,18 @@ DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'user
                                                         'category': 'category2',
                                                         'place': 0, 'delete': False}}]
         }
+
+# USER_PAGE в DATA
+# is_page   True/False показвать блок со страницей пользователя или нет
+# user_img  путь к аве пользователя
+# type  me/other, отображает страницу как личную или как чужую
+# role  отображение роли, при значении '' ничего не отображается
+# status    статус пользователя
+# subs posts rating top кол-во подписчиков, постов, рейтинг, место в топе
+# username имя пользователя
+# user_id id пользователя
+# error_message сообщение об ошибке(если возникла ошибка при редактировании профиля)
+# is_sub is_block нажата или не нажата кнопка подписки/блокировки
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -73,11 +93,30 @@ def index():
 
     # если публикация является репостом, то в reposted_content содержиться информация о репостнутой публикации
     data = DATA
+    data['user_page']['is_page'] = False
     return render_template('main.html', data=data, title='Главная')
+
+
+@app.route('/author/<username>', methods=['GET', 'POST'])
+def user_page(username):
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        print('form-form-form')
+        print(form.alias.data)
+        print(form.about.data)
+        print(form.avatar.data)
+        data = DATA
+        data['user_page']['username'] = form.alias.data
+        data['user_page']['status'] = form.about.data
+    else:
+        data = DATA
+    data['user_page']['is_page'] = True
+    return render_template('main.html', data=data, title=username, form=form)
 
 
 @app.route('/post', methods=['POST'])
 def post():
+    print('post-post-post')
     if request:
         print(request.json)
     return 'return'
