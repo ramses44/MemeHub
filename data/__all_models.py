@@ -43,7 +43,7 @@ class RegisterForm(FlaskForm):
 
 
 class TagAddingForm(FlaskForm):
-    title = StringField('Тег (без "#")', validators=(DataRequired(), ))
+    title = StringField('Тег (без "#")', validators=(DataRequired(),))
     submit = SubmitField("Добавить")
 
 
@@ -54,7 +54,15 @@ class MemeAddingForm(FlaskForm):
 
 
 class EditProfileForm(FlaskForm):
+    key = StringField()
     alias = StringField('Псевдоним')
     about = StringField("Немного о себе")
     avatar = FileField("Изображение профиля", validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField("Зарегистрироваться")
+
+
+class MemePublishForm(FlaskForm):
+    note = StringField()
+    tags = StringField()
+    img = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!'), DataRequired()])
+    submit = SubmitField("Опубликовать")
