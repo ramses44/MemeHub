@@ -111,8 +111,11 @@ def get_user_page_data(username_id):
     user = session.query(User).filter(User.id == username_id).first()
     data = user.get_data()
     data['user_img'] = '../../static/img/avatars/' + data['user_img']
-    if str(current_user.id) == str(username_id):
-        data['type'] = 'me'
+    if current_user.is_authenticated:
+        if str(current_user.id) == str(username_id):
+            data['type'] = 'me'
+        else:
+            data['type'] = 'other'
     else:
         data['type'] = 'other'
     return data
