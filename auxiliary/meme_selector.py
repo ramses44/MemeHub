@@ -1,6 +1,6 @@
 from data.db_session import create_session, global_init
 from data.users import User
-from data.memes import Meme
+from data.memes import Meme, Repost
 from data.tags import Tag
 
 TOP_LEN = 5
@@ -98,6 +98,30 @@ def get_user_memes(user_id):
     session = create_session()
     memes = session.query(Meme).filter(Meme.author.like(user_id)).all()
     return memes
+
+
+def search(text, k=0):
+    """Ф-ия для поиска публикаций по запросу"""
+
+    ses = create_session()
+
+    if text[0] == '~':  # Если это хештег
+        text = text.lstrip('~')
+        tags = set(ses.query(Tag).filter(Tag.title.like(f'%{text}%')).all())
+
+        memes = ses.query(Meme).all()
+        memes = list(filter(lambda x: tags & set(x.tags), memes))
+        memes.sort(key=lambda x: x.publication_date, reverse=True)
+
+        return memes[k * LAST_PUBS_COUNT:(k + 1) * LAST_PUBS_COUNT]
+
+    else:  # Если не хештег, то ищем в подписях к публикациям
+
+        pubs = ses.query(Meme).filter(Meme.title.like(f'%{text}%')).all() + \
+            ses.query(Repost).filter(Repost.title.like(f'%{text}%')).all()
+        pubs.sort(key=lambda x: x.publication_date, reverse=True)
+
+        return pubs[k * LAST_PUBS_COUNT:(k + 1) * LAST_PUBS_COUNT]
 
 
 if __name__ == '__main__':

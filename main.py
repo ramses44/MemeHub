@@ -123,6 +123,18 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
+@app.route('/search/<text>')
+def search(text):
+    """Ф-ия для реализации поиска по публикациям (тегам)"""
+
+    data = gen_data()
+    data['content'] = do_search(text).json['content']
+    data['user_page'] = dict()
+    data['user_page']['is_page'] = False
+
+    return render_template('main.html', data=data, title=text + ' - Поиск')
+
+
 @app.route('/subscribe/<int:uid>')
 def subscribe(uid):
     """Ф-ия для подписки на пользователя, id которого передан"""
