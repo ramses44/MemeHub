@@ -12,7 +12,6 @@ from flask_restful import abort
 from data.tags import Tag
 from datetime import datetime
 from gen_api import *
-import requests
 
 ROLES = ['user', 'moder', 'admin']
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
@@ -122,6 +121,25 @@ def get_user_page_data(username_id):
 def load_user(user_id):
     session = db_session.create_session()
     return session.query(User).get(user_id)
+
+
+@app.route('/subscribe/<int:uid>')
+def subscribe(uid):
+    """Ф-ия для подписки на пользователя, id которого передан"""
+
+    if not current_user.is_authenticated:
+        abort(401, message="Вы не авторизованы!")
+    else:
+        ses = db_session.create_session()
+
+        u1 = ses.query(User).get(current_user.get_id())
+        u2 = ses.query(User).get(uid)
+        u1.subscribed.append(u2)
+        u2.subscribers.append(u1)
+
+        ses.commit()
+
+        return redirect('#')
 
 
 @app.route('/', methods=['GET', 'POST'])
