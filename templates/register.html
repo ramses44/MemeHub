@@ -1,152 +1,99 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="meme_block fixed_block">
-    <div class="auth_note_reg_log">Регистрация</div>
-    <form method="post" novalidate enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.email.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.email(class="search") }}
-                    </div>
-                </div>
+<div class="meme_block">
+    <div class="publish_block">
+        <form method="post" novalidate enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="pub_head">Регистрация</div>
+
+            <div class="pub_notes">E-mail</div>
+            <div class="pub_input_div">
+                {{ form.email(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
             {% for error in form.email.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.password.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.password(class="search") }}
-                    </div>
-                </div>
+            <div class="pub_notes">Пароль</div>
+            <div class="pub_input_div">
+                {{ form.password(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
             {% for error in form.password.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.rep_password.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.rep_password(class="search") }}
-                    </div>
-                </div>
+            <div class="pub_notes">Повтор пароля</div>
+            <div class="pub_input_div">
+                {{ form.rep_password(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
             {% for error in form.rep_password.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                 <div class="label_note">
-                     {{ form.alias.label }}
-                 </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.alias(class="search") }}
-                    </div>
-                </div>
+            <div class="pub_notes">Псевдоним</div>
+            <div class="pub_input_div">
+                {{ form.alias(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
             {% for error in form.alias.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.bdate.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.bdate(class="search", type="date") }}
-                    </div>
-                </div>
+            <div class="pub_notes">Дата рождения</div>
+            <div class="pub_input_div">
+                {{ form.bdate(rows=5, autocomplete="off", maxlength=80, class="pub_input", type="date") }}
             </div>
             {% for error in form.bdate.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.about.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.about(class="search", rows=5) }}
-                    </div>
-                </div>
+            <div class="pub_notes">Немного о себе</div>
+            <div class="pub_input_div">
+                {{ form.about(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
             {% for error in form.about.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
+                <div class="pub_error_note">{{ error }}</div>
             {% endfor %}
-        </p>
 
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.avatar.label }}
-                </div>
-                <div class="file_upload">
-                    <label>
-                        {{ form.avatar(class="input-group mb-3") }}
-                    </label>
-                </div>
+            <div class="pub_notes">Изображение профиля</div>
+            <div class="pub_btn_grp">
+                <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
+                <div id="div_meme" class="pub_choose_txt"></div>
             </div>
-            {% for error in form.avatar.errors %}
-                <div class="input_block">
-                    <div class="error_note">
-                        {{ error }}
-                    </div>
-                </div>
-            {% endfor %}
-        </p>
+            <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
+            {{ form.avatar(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
 
-        <p>{{ form.submit(type="submit", class="login_button") }}</p>
-    </form>
+            <div class="pub_btn_grp">
+                <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Зарегистрироваться</div>
+            </div>
+            {{ form.submit(type="submit", style="display: none;", id="publish-submit") }}
+
+        </form>
+    </div>
 </div>
+
+<script>
+        var input = document.getElementById( 'input_meme' );
+        var infoArea = document.getElementById( 'div_meme' );
+        input.addEventListener( 'change', showFileName );
+
+        function showFileName( event ) {
+            var input = event.srcElement;
+            var fileName = input.files[0].name;
+            infoArea.textContent = fileName;
+        }
+
+        function preview_image(event)
+        {
+            var reader = new FileReader();
+            reader.onload = function()
+            {
+                var output = document.getElementById('img_meme');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+</script>
 
 {% endblock %}

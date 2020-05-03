@@ -114,3 +114,38 @@
 img[src=""] {
     display: none;
 }
+
+.pub_error_note {
+    width: 100%;
+    background-color: transparent;
+    font-size: medium;
+    color: rgb(220,80,80);
+    font-family: RegularFont;
+    height: 30px;
+    line-height: 30px;
+    text-align: left;
+}
+
+.pub_r_btn {
+    height: 20px;
+    margin: 0;
+    width: 20px;
+    float: left;
+}
+
+.r_btn_grp {
+    height: 20px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.r_btn_note {
+    text-indent: 5px;
+    float: left;
+    font-family: RegularFont;
+    font-size: medium;
+    color: rgb(100,100,100);
+    height: 20px;
+    line-height: 20px;
+    text-align: left;
+}

@@ -3,59 +3,40 @@
 {% block content %}
 
 <div class="meme_block fixed_block">
-    <div class="auth_note_reg_log">Авторизация</div>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.email.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.email(class="search") }}
-                    </div>
-                </div>
+    <div class="publish_block">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="pub_head">Авторизация</div>
+
+            <div class="pub_notes">E-mail</div>
+            <div class="pub_input_div">
+                {{ form.email(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
-                {% for error in form.email.errors %}
-                    <div class="input_block">
-                        <div class="error_note">
-                            {{ error }}
-                        </div>
-                    </div>
-                {% endfor %}
-        </p>
-        <p>
-            <div class="input_block">
-                <div class="label_note">
-                    {{ form.password.label }}
-                </div>
-                <div class="search_div_div">
-                    <div class="search_div_n">
-                        {{ form.password(class="search") }}
-                    </div>
-                </div>
+            {% for error in form.email.errors %}
+                <div class="pub_error_note">{{ error }}</div>
+            {% endfor %}
+
+            <div class="pub_notes">Пароль</div>
+            <div class="pub_input_div">
+                {{ form.password(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
             </div>
-                {% for error in form.password.errors %}
-                    <div class="input_block">
-                        <div class="error_note">
-                            {{ error }}
-                        </div>
-                    </div>
-                {% endfor %}
-        </p>
-        <p>
-            <div class="input_block2">
-                <div class="remember_button">
-                    {{ form.remember_me() }}
-                </div>
-                <div class="label_note remember_note">
-                    {{ form.remember_me.label }}
-                </div>
+            {% for error in form.password.errors %}
+                <div class="pub_error_note">{{ error }}</div>
+            {% endfor %}
+
+            <div class="r_btn_grp">
+                {{ form.remember_me(class="pub_r_btn") }}
+                <div class="r_btn_note">Запомнить меня</div>
             </div>
-        </p>
-        <p>{{ form.submit(type="submit", class="login_button") }}</p>
-    </form>
+
+            <div class="pub_btn_grp">
+                <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Войти</div>
+            </div>
+            {{ form.submit(type="submit", class="login_button", style="display: none;", id="publish-submit") }}
+        </form>
+    </div>
 </div>
+
 
 {% endblock %}
