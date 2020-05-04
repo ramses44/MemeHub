@@ -6,14 +6,17 @@ from flask_login import login_user, logout_user, current_user, login_required, L
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
-from auxiliary import avatar_convert, meme_selector
+from auxiliary import avatar_convert, meme_selector, user_selector
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
 from datetime import datetime
 from gen_api import *
+import time
+from threading import Thread
 
 ROLES = ['user', 'moder', 'admin']
+REFRESH_PERIOD = 12
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
              'status': 'users_status',
              'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
@@ -55,12 +58,26 @@ USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': '
 # is_sub is_block нажата или не нажата кнопка подписки/блокировки
 
 
+def refresh_rating():
+    """Функция, исполняемая по расписанию для обновления рейтинга пользователелй"""
+
+    ses = db_session.create_session()
+
+    while True:
+        for user in ses.query(User).all():
+            user.rating = user_selector.calculate_rating(user.id)
+
+        ses.commit()
+        time.sleep(REFRESH_PERIOD * 60 * 60)
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/memehub.sqlite")
 app.register_blueprint(blueprint)
 login_manager = LoginManager()
 login_manager.init_app(app)
+Thread(target=refresh_rating).start()  # Обновление рейтингов и запуск потока
 
 
 def gen_data(do_get_content=True):

@@ -36,6 +36,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                primaryjoin=(followers.c.author == id),
                                secondaryjoin=(followers.c.subscriber == id),
                                backref='author', lazy='dynamic')
+    rating = sqlalchemy.Column(sqlalchemy.Integer, default=0)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
