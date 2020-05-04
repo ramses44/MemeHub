@@ -51,7 +51,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return {'is_page': True,
                 'user_img': self.avatar,
                 'type': 'other',
-                'role': {'0': '', '1': '', '2': 'moder', '3': 'admin'}[str(self.role)],
+                'role': {'0': '', '1': 'moder', '2': 'admin'}[str(self.role)],
                 'status': self.about,
                 'subs': 666,
                 'posts': 666,

@@ -16,6 +16,7 @@ import time
 from threading import Thread
 
 ROLES = ['user', 'moder', 'admin']
+USER_TOP = 5
 REFRESH_PERIOD = 12
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
              'status': 'users_status',
@@ -133,6 +134,20 @@ def top_memes():
     res['content'] = content
 
     return render_template('main.html', data=res, title='Топ мемов')
+
+
+@app.route('/top_users')
+def top_users():
+    """Топ пользователей"""
+
+    ses = db_session.create_session()
+    users = ses.query(User).filter(User.id != 0).all()
+    users = sorted(users, key=lambda x: x.rating, reverse=True)[:USER_TOP]
+
+    data = gen_data(do_get_content=False)
+    data['content'] = [get_user_page_data(u.id) for u in users]
+
+    return render_template('top_users.html', data=data, title='Топ пользователей')
 
 
 @app.route('/search/<text>')

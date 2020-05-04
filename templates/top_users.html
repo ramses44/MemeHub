@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% for user in data['content'] %}
+        <div class="meme_block">
+        <div class="head_block">
+            <div class="img_sub_block">
+                <div class="img_block">
+                    <img src="{{ user['user_img'] }}" class="up_img_other">
+                </div>
+                <div class="sub_block">
+                    {% if user['type'] != 'me' %}
+                        {% if data['user_page']['is_sub'] %}
+                            <div class="sub_button sub_button_true" id="sub-button{{ user['user_id'] }}" onclick="sub_click({{ user['user_id'] }})">Вы подписаны</div>
+                        {% else %}
+                            <div class="sub_button sub_button_false" id="sub-button{{ user['user_id'] }}" onclick="sub_click({{ user['user_id'] }})">Подписаться</div>
+                        {% endif %}
+                    {% endif %}
+                    {% if data['info']['role'] == 'admin' %}
+                        {% if user['is_block'] %}
+                            <div class="sub_button block_button_true" id="block-button{{ user['user_id'] }}" onclick="block_click({{ user['user_id'] }})">Разблокировать</div>
+                        {% else %}
+                            <div class="sub_button block_button_false" id="block-button{{ user['user_id'] }}" onclick="block_click({{ user['user_id'] }})">Заблокировать</div>
+                        {% endif %}
+                    {% endif %}
+                    {% if data['info']['role'] != 'admin' %}
+                        <style type="text/css">
+                            .head_block {
+                                height: 236px;
+                            }
+                        </style>
+                        <style type="text/css">
+                            .head_block {
+                                height: 200px;
+                            }
+                        </style>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="username_block">
+                <div class="up_role">
+                    {% if user['role'] %}
+                        <div class="admin_role">{{ user['role'] }}</div>
+                    {% endif %}
+                </div>
+                    <div class="up_text_block_other up_username_div_other">
+                        <div class="up_text_block_input_other up_username_other">{{ user['username'] }}</div>
+                    </div>
+                    <div class="up_text_block_other up_status_div_other">
+                        <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ user['status'] }}</div>
+                    </div>
+                <div class="info_block">
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Подписчики</div>
+                        <div class="up_data_block_part2" id="subs-number{{ user['user_id'] }}">{{ user['subs'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Публикации</div>
+                        <div class="up_data_block_part2">{{ user['posts'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Рейтинг</div>
+                        <div class="up_data_block_part2">{{ user['rating'] }}</div>
+                    </div>
+                    <div class="up_data_block">
+                        <div class="up_data_block_part1">Место в топе</div>
+                        <div class="up_data_block_part2">{{ user['top'] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div> <br>
+    {% endfor %}
+
+<script>
+    function post(url, data, callback) {
+        try {
+             var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+             req.open('POST', url, 1);
+             req.setRequestHeader('Content-type', 'application/json');
+             req.send(data)
+         } catch (e) {
+             window.console && console.log(e);
+         }
+        }
+
+    function reload() {
+        window.location.reload()
+    }
+    </script>
+
+<script language="javascript">
+
+        function sub_click(id){
+
+            btn_name = "sub-button" + id.toString();
+            subs_name = "subs-number" + id.toString();
+            if (document.getElementById(btn_name).innerHTML == "Вы подписаны") {
+                document.getElementById(btn_name).innerHTML = "Подписаться";
+                document.getElementById(btn_name).classList.remove("sub_button_true");
+                document.getElementById(btn_name).classList.add("sub_button_false");
+                document.getElementById(subs_name).innerHTML = parseInt(document.getElementById(subs_name).innerHTML) - 1;
+                post("/post", "{\"target_id\":\"" + id.toString() + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
+            }
+            else
+            {
+                document.getElementById(btn_name).innerHTML = "Вы подписаны";
+                document.getElementById(btn_name).classList.remove("sub_button_false");
+                document.getElementById(btn_name).classList.add("sub_button_true");
+                document.getElementById(subs_name).innerHTML = parseInt(document.getElementById(subs_name).innerHTML) + 1;
+                post("/post", "{\"target_id\":\"" + id.toString() + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"sub\"}");
+            }
+        }
+
+        function block_click(id){
+
+            btn_name = "block-button" + id.toString();
+            if (document.getElementById(btn_name).innerHTML == "Разблокировать") {
+                document.getElementById(btn_name).innerHTML = "Заблокировать";
+                document.getElementById(btn_name).classList.remove("block_button_true");
+                document.getElementById(btn_name).classList.add("block_button_false");
+                post("/post", "{\"target_id\":\"" + id.toString() + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unblock\"}");
+            }
+            else
+            {
+                document.getElementById(btn_name).innerHTML = "Разблокировать";
+                document.getElementById(btn_name).classList.remove("block_button_false");
+                document.getElementById(btn_name).classList.add("block_button_true");
+                post("/post", "{\"target_id\":\"" + id.toString() + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"block\"}");
+            }
+        }
+
+</script>
+
+{% endblock %}
