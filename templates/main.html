@@ -194,7 +194,10 @@
     {% endif %}
 </div>
 {% endfor %}
-<div class="meme_block load_button">Загузить ещё</div>
+
+{% if data['load_more'] %}
+    <div class="meme_block load_button">Загузить ещё</div>
+{% endif %}
 
 
 <script>

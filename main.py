@@ -19,32 +19,6 @@ USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': '
              'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
              'error_message': '',
              'is_sub': True, 'is_block': False}
-DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User', 'user_id': 45,
-                 'admin': False},
-        'content': [
-            {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
-             'date': '01.01.2020',
-             'note': '', 'meme_img': '../../static/img/img1.jpg', 'likes': 3674,
-             'reposts': 25,
-             'is_liked': False, 'is_reposted': True, 'category': 'category1', 'place': 13, 'delete': False},
-            {'type': 'meme', 'id': '2', 'author_name': 'AuthorName2', 'author_img': '../../static/img/img1.jpg',
-             'date': '02.02.2022',
-             'note': 'NoteAboveMeme2', 'meme_img': '../../static/img/img2.jpg', 'likes': 277,
-             'reposts': 178,
-             'is_liked': True, 'is_reposted': False, 'category': 'category2', 'place': 0, 'delete': True},
-            {'type': 'repost', 'id': '3', 'delete': True, 'author_name': 'AuthorName3',
-             'author_img': '../../static/img/img1.jpg',
-             'date': '02.02.2022', 'reposted_content': {'id': '2', 'author_name': 'AuthorName2',
-                                                        'author_img': '../../static/img/img1.jpg',
-                                                        'date': '02.02.2022',
-                                                        'note': 'NoteAboveMeme2',
-                                                        'meme_img': '../../static/img/img2.jpg',
-                                                        'likes': 277,
-                                                        'reposts': 178,
-                                                        'is_liked': True, 'is_reposted': False,
-                                                        'category': 'category2',
-                                                        'place': 0, 'delete': False}}]
-        }
 
 # в info информация о пользователе:
 # is_auth авторизирован или нет
@@ -89,17 +63,24 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-def gen_data():
+def gen_data(do_get_content=True):
     """Функция для генерации данных для подгрузки темплейта"""
 
     # В зависимости от того, авторизован ли пользователь, генерируем данные
+    info = dict(is_auth=False)
     if current_user.is_authenticated:
         info = generate_user_info(current_user.get_id())
-        res = get_content(uid=current_user.get_id(), by_server=True)
-    else:
-        info = dict(is_auth=False)
-        res = get_content(by_server=True)
 
+    if do_get_content:
+        if current_user.is_authenticated:
+            res = get_content(uid=current_user.get_id(), by_server=True)
+        else:
+            res = get_content(by_server=True)
+    else:
+        res = {}
+
+    res['user_page'] = dict(is_page=False)
+    res['load_more'] = True
     res['info'] = info  # Совмещаем данные в один словарь
 
     return res  # Возвращаем его
@@ -123,16 +104,28 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
+@app.route('/top_memes')
+def top_memes():
+    """Топ мемов"""
+
+    top = meme_selector.get_most_popular()
+    content = get_content(uid=current_user.get_id(), by_server=True, data=top)['content']
+
+    res = gen_data(do_get_content=False)
+    res['load_more'] = False
+    res['content'] = content
+
+    return render_template('main.html', data=res, title='Топ мемов')
+
+
 @app.route('/search/<text>')
 def search(text):
     """Ф-ия для реализации поиска по публикациям (тегам)"""
 
-    data = gen_data()
-    data['content'] = do_search(text).json['content']
-    data['user_page'] = dict()
-    data['user_page']['is_page'] = False
+    data = gen_data(do_get_content=False)
+    data['content'] = do_search(text, int(current_user.get_id())).json['content']
 
-    return render_template('main.html', data=data, title=text + ' - Поиск')
+    return render_template('main.html', data=data, title='Поиск: ' + text)
 
 
 @app.route('/subscribe/<int:uid>')
@@ -157,11 +150,10 @@ def subscribe(uid):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Главная страница"""
+
     data = gen_data()
-    # data = DATA
-    data['user_page'] = dict()
-    data['user_page']['is_page'] = False
-    print(data)
+    with open('data.json', 'w') as f:
+        print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
 
 

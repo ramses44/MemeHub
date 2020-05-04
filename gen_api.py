@@ -26,7 +26,7 @@ def generate_user_info(uid):
 
 
 @blueprint.route('/get_content/<int:uid>')
-def get_content(uid=0, by_server=False, ):
+def get_content(uid=0, by_server=False, data=()):
     """Функция для AJAX запроса по кнопке "Загрузить ещё"
     Если пользователь авторизован, нужно передавать его id,
     иначе uid=0 - это анонимный пользователь
@@ -34,9 +34,10 @@ def get_content(uid=0, by_server=False, ):
     Также используется для генерации начального контента другими ф-ями"""
 
     k = int(request.cookies.get("k", 0))
+    uid = int(uid)
 
     # Если пользователь авторизован, получаем рекомендуемые мемы, иначе последние опубликованные
-    tape, k = meme_selector.get_tape(uid, k)
+    tape, k = meme_selector.get_tape(uid, k) if not data else (data, 0)
     ses = db_session.create_session()
 
     content = []
@@ -86,12 +87,12 @@ def get_content(uid=0, by_server=False, ):
 
 
 @blueprint.route('/do_search/<data>', methods=['POST'])
-def do_search(data):
+def do_search(data, uid=0):
 
     try:
-        uid, k = request.json['uid'], request.json['k']
+        uid, k = int(request.json['uid']), request.json['k']
     except TypeError:
-        uid = 0; k = 0
+        k = 0
 
     ses = db_session.create_session()
     content = []
