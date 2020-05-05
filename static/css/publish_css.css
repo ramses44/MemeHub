@@ -1,0 +1,116 @@
+.publish_block {
+    margin: 18px;
+}
+
+.pub_head {
+    width: 100%;
+    font-family: BoldFont;
+    font-size: large;
+    color: rgb(50,50,50);
+    height: 15px;
+    line-height: 15px;
+    text-align: left;
+}
+
+.pub_notes {
+    width: 100%;
+    font-family: RegularFont;
+    font-size: medium;
+    color: rgb(100,100,100);
+    height: 15px;
+    line-height: 15px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.pub_input {
+    outline-offset: 0;
+    outline: none;
+    border: 0px;
+    width: 100%;
+    background-color: transparent;
+    font-size: medium;
+    color: rgb(50,50,50);
+    font-family: RegularFont;
+    height: 30px;
+    line-height: 30px;
+    text-align: left;
+    text-indent: 9px;
+}
+
+.pub_input_div {
+    background-color: rgb(250,250,250);
+    border-radius: 4px;
+    width: 100%;
+    height: 30px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.pub_input:focus {
+    background-color: rgb(210,210,210);
+}
+
+.pub_choose_btn {
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    font-family: BoldFont;
+    color: rgb(255,255,255);
+    background-color: rgb(210,210,210);
+    letter-spacing: 0.5px;
+    text-align: center;
+    width: 200px;
+    border-radius: 4px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: 0.3s all ease;
+}
+
+.pub_choose_btn:hover {
+    transform: scale(1.05);
+}
+
+.pub_choose_btn:active {
+    transform: scale(0.95);
+}
+
+.pub_choose_txt {
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    font-family: BoldFont;
+    color: rgb(210,210,210);
+    letter-spacing: 0.5px;
+    text-align: left;
+    width: 400px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    margin-left: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.pub_btn_grp {
+    height: 30px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.pub_img_preview {
+    margin-top: 15px;
+    width: 50%;
+    border-radius: 4px;
+    font-family: BoldFont;
+    letter-spacing: 0.5px;
+    color: rgb(210,210,210);
+    text-indent: 10px;
+}
+
+img[src=""] {
+    display: none;
+}

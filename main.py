@@ -105,12 +105,17 @@ def gen_data(do_get_content=True):
 
 
 def get_user_page_data(username_id):
+    """Функция для получения данных о пользователе"""
     session = db_session.create_session()
     user = session.query(User).filter(User.id == username_id).first()
     data = user.get_data()
     data['user_img'] = '../../static/img/avatars/' + data['user_img']
-    if str(current_user.id) == str(username_id):
-        data['type'] = 'me'
+    # определяется, как будет отображаться страница: как личная или как страница другого пользователя
+    if current_user.is_authenticated:
+        if str(current_user.id) == str(username_id):
+            data['type'] = 'me'
+        else:
+            data['type'] = 'other'
     else:
         data['type'] = 'other'
     return data
@@ -207,43 +212,58 @@ def post():
 def user_page(username_id):
     """Cтраница пользователя"""
     form = EditProfileForm()
+    form2 = MemePublishForm()
     error_message = ''
+
+    if form2.validate_on_submit():
+        if form.alias.data == '' and form.about.data == '' and form.avatar.data is None:
+            # обработка публикаций мемов
+            print('meme-meme-meme')
+            print(form2.note.data)
+            print(form2.tags.data)
+            print(form2.img.data)
+            pass
+
     if form.validate_on_submit():
-        # обработка изменений профиля
-        session = db_session.create_session()
-        user = session.query(User).filter(User.id == current_user.get_id()).first()
+        if not(form.alias.data == '' and form.about.data == '' and form.avatar.data is None):
+            # print('profile-profile-profile')
+            # print(form.alias.data)
+            # print(form.about.data)
+            # print(form.avatar.data)
+            # обработка изменений профиля
+            session = db_session.create_session()
+            user = session.query(User).filter(User.id == current_user.get_id()).first()
 
-        if form.alias.data != user.alias:  # обработка изменений имени пользователя
-            if form.alias.data == '':
-                error_message = 'Такое имя пользователя недопустимо'
-            else:
-                if form.alias.data in [i.alias for i in session.query(User).all()]:
-                    error_message = 'Такое имя пользователя уже существует'
+            if form.alias.data != user.alias:  # обработка изменений имени пользователя
+                if form.alias.data == '':
+                    error_message = 'Такое имя пользователя недопустимо'
                 else:
-                    user.alias = form.alias.data
+                    if form.alias.data in [i.alias for i in session.query(User).all()]:
+                        error_message = 'Такое имя пользователя уже существует'
+                    else:
+                        user.alias = form.alias.data
 
-        if form.about.data != user.about:  # обработка изменений статуса
-            user.about = form.about.data
+            if form.about.data != user.about:  # обработка изменений статуса
+                user.about = form.about.data
 
-        if form.avatar.data:  # обработка изменений аватарки
-            filename = secure_filename(form.avatar.data.filename)
-            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
-            form.avatar.data.save('static/img/avatars/' + fn)
-            try:
-                avatar_convert.convert('static/img/avatars/' + fn)
-            except FileNotFoundError:
+            if form.avatar.data:  # обработка изменений аватарки
+                filename = secure_filename(form.avatar.data.filename)
+                fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+                form.avatar.data.save('static/img/avatars/' + fn)
+                try:
+                    avatar_convert.convert('static/img/avatars/' + fn)
+                except FileNotFoundError:
+                    fn = None
+            else:
                 fn = None
-        else:
-            fn = None
-        if fn is not None:
-            user.avatar = fn
+            if fn is not None:
+                user.avatar = fn
 
-        session.commit()
+            session.commit()
     data = gen_data()
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
-    print(data)
-    return render_template('main.html', data=data, title=data['user_page']['username'], form=form)
+    return render_template('main.html', data=data, title=data['user_page']['username'], form=form, form2=form2)
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -93,12 +93,41 @@
         </div>
 
         <div>
-            {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click()", style="display: none;") }}
+            {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click();", style="display: none;") }}
         </div>
 
         <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
     </form>
 </div>
+
+{% if data['user_page']['type'] == "me" %}
+    <div class="meme_block">
+        <div class="publish_block">
+            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';">
+                {{ form2.hidden_tag() }}
+                <div class="pub_head">Новая публикация</div>
+                <div class="pub_notes">Комментарий</div>
+                <div class="pub_input_div">
+                    {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
+                </div>
+                <div class="pub_notes">Теги</div>
+                <div class="pub_input_div">
+                    {{ form2.tags(autocomplete="off", maxlength=40, class="pub_input") }}
+                </div>
+                <div class="pub_btn_grp">
+                    <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
+                    <div id="div_meme" class="pub_choose_txt"></div>
+                </div>
+                <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
+                <div class="pub_btn_grp">
+                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Опубликовать</div>
+                </div>
+                {{ form2.img(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
+                {{ form2.submit(type="submit", style="display: none;", id="publish-submit") }}
+            </form>
+        </div>
+    </div>
+{% endif %}
 
 {% endif %}
 
@@ -217,7 +246,7 @@
     }
     </script>
 
-<script language="javascript">
+<script>
         function changeImage1(meme_id) {
 
             if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png")
@@ -289,6 +318,27 @@
                 document.getElementById("block-button").classList.add("block_button_true");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"block\"}");
             }
+        }
+
+        var input = document.getElementById( 'input_meme' );
+        var infoArea = document.getElementById( 'div_meme' );
+        input.addEventListener( 'change', showFileName );
+
+        function showFileName( event ) {
+            var input = event.srcElement;
+            var fileName = input.files[0].name;
+            infoArea.textContent = fileName;
+        }
+
+        function preview_image(event)
+        {
+            var reader = new FileReader();
+            reader.onload = function()
+            {
+                var output = document.getElementById('img_meme');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
         }
 
 </script>
