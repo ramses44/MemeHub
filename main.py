@@ -136,7 +136,6 @@ def index():
     # data = DATA
     data['user_page'] = dict()
     data['user_page']['is_page'] = False
-    print(data)
     return render_template('main.html', data=data, title='Главная')
 
 
@@ -150,7 +149,28 @@ def post():
     # или id пользователя, на которого подписались/отписались
     # или id пользователя, которого заблокировали/разблокировали
     if request:
-        print(request.json)
+        req = request.json
+        session = db_session.create_session()
+        user = session.query(User).filter(User.id == req['user_id']).first()
+        if req['type'] == 'like':
+            target = session.query(Meme).filter(User.id == req['target_id']).first()
+            # user.liked.append(target)
+            # target.likes.append(user)
+        elif req['type'] == 'repost':
+            pass
+        elif req['type'] == 'delete':
+            pass
+        elif req['type'] == 'sub':
+            pass
+        elif req['type'] == 'sub':
+            pass
+        elif req['type'] == 'unsub':
+            pass
+        elif req['type'] == 'block':
+            pass
+        elif req['type'] == 'unblock':
+            pass
+        session.commit()
     return 'qwerty'
 
 

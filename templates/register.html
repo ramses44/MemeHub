@@ -8,6 +8,12 @@
 
             <div class="pub_head">Регистрация</div>
 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="pub_error_note">{{ messages[-1] }}</div>
+                {% endif %}
+            {% endwith %}
+
             <div class="pub_notes">E-mail</div>
             <div class="pub_input_div">
                 {{ form.email(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
