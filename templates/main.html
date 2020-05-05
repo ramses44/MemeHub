@@ -27,21 +27,21 @@
                             <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">Подписаться</div>
                         {% endif %}
                     {% endif %}
-                    {% if data['info']['admin'] %}
+                    {% if data['info']['role'] == 'admin' and data['user_page']['role'] != 'admin' %}
                         {% if data['user_page']['is_block'] %}
                             <div class="sub_button block_button_true" id="block-button" onclick="block_click()">Разблокировать</div>
                         {% else %}
                             <div class="sub_button block_button_false" id="block-button" onclick="block_click()">Заблокировать</div>
                         {% endif %}
                     {% endif %}
-                    {% if data['user_page']['type'] == 'me' or not data['info']['admin'] %}
+                    {% if data['user_page']['type'] == 'me' or data['info']['role'] != 'admin' %}
                         <style type="text/css">
                             .head_block {
                                 height: 236px;
                             }
                         </style>
                     {% endif %}
-                    {% if data['user_page']['type'] == 'me' and not data['info']['admin'] %}
+                    {% if data['user_page']['type'] == 'me' and data['info']['role'] != 'admin' %}
                         <style type="text/css">
                             .head_block {
                                 height: 200px;
@@ -100,7 +100,7 @@
     </form>
 </div>
 
-{% if data['user_page']['type'] == "me" %}
+{% if data['user_page']['type'] == "me" and not data['user_page']['is_block'] %}
    {% include "meme_adding.html" %}
 {% endif %}
 
@@ -224,6 +224,11 @@
 <script>
         function changeImage1(meme_id) {
 
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
+                return;
+            }
+
             if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png")
             {
                 document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
@@ -240,6 +245,11 @@
             }
         }
         function changeImage2(meme_id) {
+
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
+                return;
+            }
 
             if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png")
             {
@@ -258,10 +268,23 @@
         }
 
         function deleteMeme(meme_id) {
+
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете удалять никакие публикации');
+                return;
+            }
+
             document.getElementById(meme_id).remove();
+            post("/post", "{\"target_id\":\"" + meme_id + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"delete\"}");
         }
 
         function sub_click(){
+
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете взаимодействовать с другими пользователями');
+                return;
+            }
+
             if (document.getElementById("sub-button").innerHTML == "Вы подписаны") {
                 document.getElementById("sub-button").innerHTML = "Подписаться";
                 document.getElementById("sub-button").classList.remove("sub_button_true");

@@ -2,9 +2,11 @@ from data.db_session import create_session, global_init
 from data.users import User
 from data.memes import Meme, Repost
 from datetime import datetime, timedelta
+from gen_api import ROLES
 
 ACTIVITY_COEFFICIENT = 1.3
 ACTIVITY_DAYS = 7
+USER_TOP = 5
 
 
 def is_active(user_id):
@@ -35,6 +37,33 @@ def calculate_rating(uid):
     rating = rating * ACTIVITY_COEFFICIENT if is_active(uid) else rating
 
     return rating
+
+
+def gen_user_info(uid, self_uid=0):
+
+    ses = create_session()
+    user = ses.query(User).get(uid)
+    me = ses.query(User).get(self_uid)
+    users = ses.query(User).filter(User.id != 0).all()
+    users = sorted(users, key=lambda x: x.rating, reverse=True)[:USER_TOP]
+
+    return {
+        'is_page': True,
+        'user_img': user.avatar,
+        'type': 'other',
+        'role': ROLES[user.role],
+        'status': user.about,
+        'subs': len(list(user.subscribers)),
+        'posts': len(list(user.memes)) + len(list(user.repostes)),
+        'rating': user.rating,
+        'top': users.index(user) + 1,
+        'username': user.alias,
+        'user_id': uid,
+        'error_message': '',
+        'is_sub': me in user.subscribers,
+        'is_block': user.is_blocked
+    }
+
 
 
 

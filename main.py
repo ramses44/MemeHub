@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
 from auxiliary import avatar_convert, meme_selector, user_selector
+from auxiliary.user_selector import USER_TOP
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
@@ -16,7 +17,6 @@ import time
 from threading import Thread
 
 ROLES = ['user', 'moder', 'admin']
-USER_TOP = 5
 REFRESH_PERIOD = 12
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
              'status': 'users_status',
@@ -108,11 +108,11 @@ def get_user_page_data(username_id):
     """Функция для получения данных о пользователе"""
     session = db_session.create_session()
     user = session.query(User).filter(User.id == username_id).first()
-    data = user.get_data()
+    data = user_selector.gen_user_info(username_id, self_uid=current_user.get_id())
     data['user_img'] = '../../static/img/avatars/' + data['user_img']
     # определяется, как будет отображаться страница: как личная или как страница другого пользователя
     if current_user.is_authenticated:
-        if str(current_user.id) == str(username_id):
+        if str(current_user.get_id()) == str(username_id):
             data['type'] = 'me'
         else:
             data['type'] = 'other'
@@ -151,6 +151,9 @@ def top_users():
 
     data = gen_data(do_get_content=False)
     data['content'] = [get_user_page_data(u.id) for u in users]
+
+    with open('data.json', 'w') as f:
+        print(data, file=f)
 
     return render_template('top_users.html', data=data, title='Топ пользователей')
 

@@ -1,2 +1,2 @@
-alembic revision --autogenerate -m "добавлен рейтинг пользователей"
+alembic revision --autogenerate -m "добавлен признак блокировки пользователей"
 alembic upgrade head
