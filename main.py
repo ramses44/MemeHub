@@ -153,9 +153,11 @@ def post():
         session = db_session.create_session()
         user = session.query(User).filter(User.id == req['user_id']).first()
         if req['type'] == 'like':
-            target = session.query(Meme).filter(User.id == req['target_id']).first()
-            # user.liked.append(target)
-            # target.likes.append(user)
+            target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            if target in user.liked:
+                user.liked.remove(target)
+            else:
+                user.liked.append(target)
         elif req['type'] == 'repost':
             pass
         elif req['type'] == 'delete':
