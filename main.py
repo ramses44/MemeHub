@@ -218,11 +218,31 @@ def user_page(username_id):
     if form2.validate_on_submit():
         if form.alias.data == '' and form.about.data == '' and form.avatar.data is None:
             # обработка публикаций мемов
-            print('meme-meme-meme')
-            print(form2.note.data)
-            print(form2.tags.data)
-            print(form2.img.data)
-            pass
+
+            if not current_user.is_authenticated:
+                # Если пользователь не вошёл в систему, кидаем ошибку
+                abort(401,
+                      message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
+
+            # Сохраняем картинку
+            filename = secure_filename(form2.img.data.filename)
+            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+            form2.img.data.save('static/img/memes/' + fn)
+
+            # Создаём мем
+            ses = db_session.create_session()
+            meme = Meme(
+                title=form2.note.data,
+                tags=[ses.query(Tag).get(t) for t in request.form.getlist('tags')],
+                author=current_user.get_id(),
+                picture=fn
+            )
+
+            # Сохраняем
+            ses.add(meme)
+            ses.commit()
+
+            print(meme, 'was published by', ses.query(User).get(current_user.get_id()))
 
     if form.validate_on_submit():
         if not(form.alias.data == '' and form.about.data == '' and form.avatar.data is None):
@@ -235,13 +255,10 @@ def user_page(username_id):
             user = session.query(User).filter(User.id == current_user.get_id()).first()
 
             if form.alias.data != user.alias:  # обработка изменений имени пользователя
-                if form.alias.data == '':
+                if not form.alias.data:
                     error_message = 'Такое имя пользователя недопустимо'
                 else:
-                    if form.alias.data in [i.alias for i in session.query(User).all()]:
-                        error_message = 'Такое имя пользователя уже существует'
-                    else:
-                        user.alias = form.alias.data
+                    user.alias = form.alias.data
 
             if form.about.data != user.about:  # обработка изменений статуса
                 user.about = form.about.data
@@ -394,7 +411,7 @@ def addmeme():
         if len(request.form.getlist('tags')) > 5:
             # Проверяем, сколько тегов добавил пользователь
             flash("Слишком много тегов! Их должно быть не больше 5")
-            return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+            return render_template('meme_adding.html', title='Добавить мем', form=form, data=gen_data(do_get_content=False), tags=tags)
 
         # Сохраняем картинку
         filename = secure_filename(form.picture.data.filename)
@@ -416,7 +433,7 @@ def addmeme():
         return redirect('/me')  # Возвращаем пользователя на свою страницу
 
     # GET-запрос
-    return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
+    return render_template('meme_adding.html', title='Добавить мем', form=form, data=gen_data(do_get_content=False), tags=tags)
 
 
 @app.route('/me')

@@ -1,5 +1,5 @@
 import sqlalchemy
-from .db_session import SqlAlchemyBase
+from .db_session import SqlAlchemyBase, create_session
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, validators
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields.html5 import EmailField
@@ -64,6 +64,10 @@ class EditProfileForm(FlaskForm):
 
 class MemePublishForm(FlaskForm):
     note = StringField()
-    tags = StringField()
     img = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!'), DataRequired()])
     submit = SubmitField("Опубликовать")
+
+    @staticmethod
+    def tags():
+        ses = create_session()
+        return map(lambda x: (x.id, x.title), ses.query(tags.Tag).all())

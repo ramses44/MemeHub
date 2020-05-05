@@ -101,32 +101,7 @@
 </div>
 
 {% if data['user_page']['type'] == "me" %}
-    <div class="meme_block">
-        <div class="publish_block">
-            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';">
-                {{ form2.hidden_tag() }}
-                <div class="pub_head">Новая публикация</div>
-                <div class="pub_notes">Комментарий</div>
-                <div class="pub_input_div">
-                    {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
-                </div>
-                <div class="pub_notes">Теги</div>
-                <div class="pub_input_div">
-                    {{ form2.tags(autocomplete="off", maxlength=40, class="pub_input") }}
-                </div>
-                <div class="pub_btn_grp">
-                    <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
-                    <div id="div_meme" class="pub_choose_txt"></div>
-                </div>
-                <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
-                <div class="pub_btn_grp">
-                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Опубликовать</div>
-                </div>
-                {{ form2.img(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
-                {{ form2.submit(type="submit", style="display: none;", id="publish-submit") }}
-            </form>
-        </div>
-    </div>
+   {% include "meme_adding.html" %}
 {% endif %}
 
 {% endif %}
@@ -342,4 +317,19 @@
         }
 
 </script>
+
+ <script>
+            var verified = [];
+            var max_tags_count = 5;
+            document.querySelector('select').onchange = function(e) {
+                if (this.querySelectorAll('option:checked').length <= max_tags_count) {
+                    verified = Array.apply(null, this.querySelectorAll('option:checked'));
+                } else {
+                    Array.apply(null, this.querySelectorAll('option')).forEach(function(e) {
+                     e.selected = verified.indexOf(e) > -1;
+                    });
+                }
+            }
+        </script>
+
 {% endblock %}

@@ -1,32 +1,40 @@
-{% extends "base.html" %}
-
 {% block content %}
+        <link rel="stylesheet" href="../../static/css/multiselect.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 
-       <div class="container">
-        <h1>Добавить мем</h1>
-        <form method="post" novalidate enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.title.label }}<br>
-                {{ form.title(class="form-control") }}<br>
-                {% for error in form.title.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            </p>
-            <p>
-                <label>#Теги</label> <br>
+       <div class="meme_block">
+        <div class="publish_block">
+            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';" onsubmit="validate()">
+                {{ form2.hidden_tag() }}
+                <div class="pub_head">Новая публикация</div>
+                <div class="pub_notes">Комментарий</div>
+                <div class="pub_input_div">
+                    {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
+                </div>
+                <div class="pub_notes">Теги</div>
                 <select class="selectpicker" multiple="multiple" data-live-search="true" id="tags" name="tags" required>
-                    {% for id, title in tags %}
+                    {% for id, title in form2.tags() %}
                         <option value={{ id }}>{{ title }}</option>
                     {% endfor %}
                 </select> <br>
-                <script>
+                <div class="pub_btn_grp">
+                    <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
+                    <div id="div_meme" class="pub_choose_txt"></div>
+                </div>
+                <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
+                <div class="pub_btn_grp">
+                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Опубликовать</div>
+                </div>
+                {{ form2.img(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
+                {{ form2.submit(type="submit", style="display: none;", id="publish-submit") }}
+            </form>
+        </div>
+    </div>
+
+<script>
                     var verified = [];
                     document.querySelector('tags').onchange = function(e) {
                         if (this.querySelectorAll('option:checked').length <= 5) {
@@ -38,21 +46,4 @@
                         }
                     }
                 </script>
-            </p>
-
-            <p>
-                {{ form.picture.label }}
-                {{ form.picture(class="input-group mb-3") }}
-                {% for error in form.picture.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div> <br>
-                {% endfor %}
-            </p>
-
-            <p>{{ form.submit(type="submit", class="btn btn-outline-primary") }}</p>
-
-        </form>
-    </div>
-
 {% endblock %}
