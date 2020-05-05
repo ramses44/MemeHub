@@ -392,51 +392,7 @@ def addtag():
 
     else:
         # GET-запрос
-        return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=DATA)
-
-
-@app.route('/addmeme', methods=['POST', 'GET'])
-def addmeme():
-    """Механизм добавления мема"""
-
-    form = MemeAddingForm()
-
-    if not current_user.is_authenticated:
-        # Если пользователь не вошёл в систему, кидаем ошибку
-        abort(401, message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
-
-    ses = db_session.create_session()
-    tags = [(t.id, t.title) for t in ses.query(Tag).all()]
-
-    if form.validate_on_submit():
-        # Если POST-запрос
-
-        if len(request.form.getlist('tags')) > 5:
-            # Проверяем, сколько тегов добавил пользователь
-            flash("Слишком много тегов! Их должно быть не больше 5")
-            return render_template('meme_adding.html', title='Добавить мем', form=form, data=gen_data(do_get_content=False), tags=tags)
-
-        # Сохраняем картинку
-        filename = secure_filename(form.picture.data.filename)
-        fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
-        form.picture.data.save('static/img/avatars' + fn)
-
-        # Создаём мем
-        meme = Meme(
-            title=form.title.data,
-            tags=[ses.query(Tag).get(t) for t in request.form.getlist('tags')],
-            author=current_user.get_id(),
-            picture=fn
-        )
-
-        # Сохраняем
-        ses.add(meme)
-        ses.commit()
-
-        return redirect('/me')  # Возвращаем пользователя на свою страницу
-
-    # GET-запрос
-    return render_template('meme_adding.html', title='Добавить мем', form=form, data=gen_data(do_get_content=False), tags=tags)
+        return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=gen_data(do_get_content=False))
 
 
 @app.route('/me')

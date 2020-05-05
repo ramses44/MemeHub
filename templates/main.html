@@ -146,7 +146,11 @@
         {% else %}
             <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>, чтобы получить возможность лайкать и репостить публикации</div>
         {% endif %}
-        <div class="category">{{ meme['category'] }}</div>
+        <div class="category">
+            {% for tag in meme['category'] %}
+                <a href="/search/~{{ tag }}">#{{ tag }}{% if not loop.last %}, {% endif %}</a>
+            {% endfor %}
+        </div>
     {% else %}
         {% set meme_r = meme['reposted_content'] %}
 

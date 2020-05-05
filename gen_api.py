@@ -56,7 +56,7 @@ def get_content(uid=0, by_server=False, data=()):
             'reposts': len(list(meme.repostes)),
             'is_liked': uid in map(lambda x: x.id, meme.likes),
             'is_reposted': uid in map(lambda x: x.id, meme.repostes),
-            'category': ", ".join(map(lambda x: x.title, meme.tags)),
+            'category': list(map(lambda x: x.title, meme.tags)),
             'place': meme_selector.get_most_popular().index(meme) + 1,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
         }
@@ -111,7 +111,7 @@ def do_search(data, uid=0):
             'reposts': len(list(meme.repostes)),
             'is_liked': uid in map(lambda x: x.id, meme.likes),
             'is_reposted': uid in map(lambda x: x.id, meme.repostes),
-            'category': ", ".join(map(lambda x: x.title, meme.tags)),
+            'category': list(map(lambda x: x.title, meme.tags)),
             'place': meme_selector.get_most_popular().index(meme) + 1,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
         }
