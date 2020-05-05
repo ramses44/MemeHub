@@ -6,46 +6,23 @@ from flask_login import login_user, logout_user, current_user, login_required, L
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
-from auxiliary import avatar_convert, meme_selector
+from auxiliary import avatar_convert, meme_selector, user_selector
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
 from datetime import datetime
 from gen_api import *
-import requests
+import time
+from threading import Thread
 
 ROLES = ['user', 'moder', 'admin']
+USER_TOP = 5
+REFRESH_PERIOD = 12
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
              'status': 'users_status',
              'subs': 123, 'posts': 321, 'rating': 56, 'top': 15, 'username': 'User', 'user_id': 34,
              'error_message': '',
              'is_sub': True, 'is_block': False}
-DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'username': 'User', 'user_id': 45,
-                 'admin': False},
-        'content': [
-            {'type': 'meme', 'id': '1', 'author_name': 'AuthorName1', 'author_img': '../../static/img/img2.jpg',
-             'date': '01.01.2020',
-             'note': '', 'meme_img': '../../static/img/img1.jpg', 'likes': 3674,
-             'reposts': 25,
-             'is_liked': False, 'is_reposted': True, 'category': 'category1', 'place': 13, 'delete': False},
-            {'type': 'meme', 'id': '2', 'author_name': 'AuthorName2', 'author_img': '../../static/img/img1.jpg',
-             'date': '02.02.2022',
-             'note': 'NoteAboveMeme2', 'meme_img': '../../static/img/img2.jpg', 'likes': 277,
-             'reposts': 178,
-             'is_liked': True, 'is_reposted': False, 'category': 'category2', 'place': 0, 'delete': True},
-            {'type': 'repost', 'id': '3', 'delete': True, 'author_name': 'AuthorName3',
-             'author_img': '../../static/img/img1.jpg',
-             'date': '02.02.2022', 'reposted_content': {'id': '2', 'author_name': 'AuthorName2',
-                                                        'author_img': '../../static/img/img1.jpg',
-                                                        'date': '02.02.2022',
-                                                        'note': 'NoteAboveMeme2',
-                                                        'meme_img': '../../static/img/img2.jpg',
-                                                        'likes': 277,
-                                                        'reposts': 178,
-                                                        'is_liked': True, 'is_reposted': False,
-                                                        'category': 'category2',
-                                                        'place': 0, 'delete': False}}]
-        }
 
 # в info информация о пользователе:
 # is_auth авторизирован или нет
@@ -82,25 +59,46 @@ DATA = {'info': {'is_auth': True, 'user_img': '../../static/img/img1.jpg', 'user
 # is_sub is_block нажата или не нажата кнопка подписки/блокировки
 
 
+def refresh_rating():
+    """Функция, исполняемая по расписанию для обновления рейтинга пользователелй"""
+
+    ses = db_session.create_session()
+
+    while True:
+        for user in ses.query(User).all():
+            user.rating = user_selector.calculate_rating(user.id)
+
+        ses.commit()
+        time.sleep(REFRESH_PERIOD * 60 * 60)
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/memehub.sqlite")
 app.register_blueprint(blueprint)
 login_manager = LoginManager()
 login_manager.init_app(app)
+Thread(target=refresh_rating).start()  # Обновление рейтингов и запуск потока
 
 
-def gen_data():
+def gen_data(do_get_content=True):
     """Функция для генерации данных для подгрузки темплейта"""
 
     # В зависимости от того, авторизован ли пользователь, генерируем данные
+    info = dict(is_auth=False)
     if current_user.is_authenticated:
         info = generate_user_info(current_user.get_id())
-        res = get_content(uid=current_user.get_id(), by_server=True)
-    else:
-        info = dict(is_auth=False)
-        res = get_content(by_server=True)
 
+    if do_get_content:
+        if current_user.is_authenticated:
+            res = get_content(uid=current_user.get_id(), by_server=True)
+        else:
+            res = get_content(by_server=True)
+    else:
+        res = {}
+
+    res['user_page'] = dict(is_page=False)
+    res['load_more'] = True
     res['info'] = info  # Совмещаем данные в один словарь
 
     return res  # Возвращаем его
@@ -129,13 +127,70 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
+@app.route('/top_memes')
+def top_memes():
+    """Топ мемов"""
+
+    top = meme_selector.get_most_popular()
+    content = get_content(uid=current_user.get_id(), by_server=True, data=top)['content']
+
+    res = gen_data(do_get_content=False)
+    res['load_more'] = False
+    res['content'] = content
+
+    return render_template('main.html', data=res, title='Топ мемов')
+
+
+@app.route('/top_users')
+def top_users():
+    """Топ пользователей"""
+
+    ses = db_session.create_session()
+    users = ses.query(User).filter(User.id != 0).all()
+    users = sorted(users, key=lambda x: x.rating, reverse=True)[:USER_TOP]
+
+    data = gen_data(do_get_content=False)
+    data['content'] = [get_user_page_data(u.id) for u in users]
+
+    return render_template('top_users.html', data=data, title='Топ пользователей')
+
+
+@app.route('/search/<text>')
+def search(text):
+    """Ф-ия для реализации поиска по публикациям (тегам)"""
+
+    data = gen_data(do_get_content=False)
+    data['content'] = do_search(text, int(current_user.get_id())).json['content']
+
+    return render_template('main.html', data=data, title='Поиск: ' + text)
+
+
+@app.route('/subscribe/<int:uid>')
+def subscribe(uid):
+    """Ф-ия для подписки на пользователя, id которого передан"""
+
+    if not current_user.is_authenticated:
+        abort(401, message="Вы не авторизованы!")
+    else:
+        ses = db_session.create_session()
+
+        u1 = ses.query(User).get(current_user.get_id())
+        u2 = ses.query(User).get(uid)
+        u1.subscribed.append(u2)
+        u2.subscribers.append(u1)
+
+        ses.commit()
+
+        return redirect('#')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Главная страница"""
+
     data = gen_data()
-    # data = DATA
-    data['user_page'] = dict()
-    data['user_page']['is_page'] = False
+    with open('data.json', 'w') as f:
+        print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
 
 
@@ -149,30 +204,7 @@ def post():
     # или id пользователя, на которого подписались/отписались
     # или id пользователя, которого заблокировали/разблокировали
     if request:
-        req = request.json
-        session = db_session.create_session()
-        user = session.query(User).filter(User.id == req['user_id']).first()
-        if req['type'] == 'like':
-            target = session.query(Meme).filter(Meme.id == req['target_id']).first()
-            if target in user.liked:
-                user.liked.remove(target)
-            else:
-                user.liked.append(target)
-        elif req['type'] == 'repost':
-            pass
-        elif req['type'] == 'delete':
-            pass
-        elif req['type'] == 'sub':
-            pass
-        elif req['type'] == 'sub':
-            pass
-        elif req['type'] == 'unsub':
-            pass
-        elif req['type'] == 'block':
-            pass
-        elif req['type'] == 'unblock':
-            pass
-        session.commit()
+        print(request.json)
     return 'qwerty'
 
 

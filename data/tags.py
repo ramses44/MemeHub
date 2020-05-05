@@ -15,3 +15,6 @@ class Tag(SqlAlchemyBase, SerializerMixin):
     def __repr__(self):
         return "<Tag> " + self.title
 
+    def __hash__(self):
+        return hash(str(self.id) + 't')
+

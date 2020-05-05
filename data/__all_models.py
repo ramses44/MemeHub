@@ -1,7 +1,8 @@
 import sqlalchemy
 from .db_session import SqlAlchemyBase
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, validators, FieldList
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, validators
 from flask_wtf.file import FileField, FileAllowed
+from wtforms.fields.html5 import EmailField
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 
@@ -32,7 +33,7 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    email = StringField('E-mail', validators=[DataRequired()])
+    email = EmailField('E-mail', validators=[DataRequired(), validators.Email()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     rep_password = PasswordField('Повтор пароля', validators=[DataRequired()])
     alias = StringField('Псевдоним', validators=[DataRequired()])

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, make_response, url_for
 from data.users import User
 from data import db_session
 from auxiliary import meme_selector
+from data.memes import Meme, Repost
 
 ROLES = ['user', 'moder', 'admin']  # Индекс соответствует номеру роли в БД
 
@@ -25,7 +26,7 @@ def generate_user_info(uid):
 
 
 @blueprint.route('/get_content/<int:uid>')
-def get_content(uid=0, by_server=False, ):
+def get_content(uid=0, by_server=False, data=()):
     """Функция для AJAX запроса по кнопке "Загрузить ещё"
     Если пользователь авторизован, нужно передавать его id,
     иначе uid=0 - это анонимный пользователь
@@ -33,14 +34,16 @@ def get_content(uid=0, by_server=False, ):
     Также используется для генерации начального контента другими ф-ями"""
 
     k = int(request.cookies.get("k", 0))
+    uid = int(uid)
 
     # Если пользователь авторизован, получаем рекомендуемые мемы, иначе последние опубликованные
-    tape, k = meme_selector.get_tape(uid, k)
+    tape, k = meme_selector.get_tape(uid, k) if not data else (data, 0)
     ses = db_session.create_session()
 
     content = []
-    for meme in tape:
-        content.append({
+    for pub in map(lambda x: ses.query(Meme).get(x.id) if type(x) == Meme else ses.query(Repost).get(x.id), tape):
+        meme = pub if type(pub) == Meme else pub.meme_
+        cont = {
             'type': 'meme',
             'id': str(meme.id),
             'author_name': meme.author_.alias,
@@ -56,7 +59,21 @@ def get_content(uid=0, by_server=False, ):
             'category': ", ".join(map(lambda x: x.title, meme.tags)),
             'place': meme_selector.get_most_popular().index(meme) + 1,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
-        })
+        }
+
+        if type(pub) == Meme:
+            content.append(cont)
+        else:
+            content.append({
+                'type': 'repost',
+                'id': str(meme.id),
+                'delete': uid == pub.user or ses.query(User).get(uid).role != ROLES.index('user'),
+                'author_name': pub.user_.alias,
+                'date': str(pub.publication_date.date()),
+                'author_id': pub.user,
+                'author_img': url_for('static', filename=f'img/avatars/{pub.user_.avatar}'),
+                'reposted_content': cont
+            })
 
     if not by_server:
         # Если запрос был отправлен клиентом (кнопкой "загрузить ещё"), а не серверной генеративной ф-ией
@@ -67,3 +84,50 @@ def get_content(uid=0, by_server=False, ):
         res = dict(content=content)
 
     return res  # Возвращаем ответ
+
+
+@blueprint.route('/do_search/<data>', methods=['POST'])
+def do_search(data, uid=0):
+
+    try:
+        uid, k = int(request.json['uid']), request.json['k']
+    except TypeError:
+        k = 0
+
+    ses = db_session.create_session()
+    content = []
+    for pub in meme_selector.search(data, k):
+        meme = pub if type(pub) == Meme else pub.meme_
+        cont = {
+            'type': 'meme',
+            'id': str(meme.id),
+            'author_name': meme.author_.alias,
+            'author_id': meme.author,
+            'author_img': url_for('static', filename=f'img/avatars/{meme.author_.avatar}'),
+            'date': str(meme.publication_date.date()),
+            'note': meme.title,
+            'meme_img': url_for('static', filename=f'img/memes/{meme.picture}'),
+            'likes': len(list(meme.likes)),
+            'reposts': len(list(meme.repostes)),
+            'is_liked': uid in map(lambda x: x.id, meme.likes),
+            'is_reposted': uid in map(lambda x: x.id, meme.repostes),
+            'category': ", ".join(map(lambda x: x.title, meme.tags)),
+            'place': meme_selector.get_most_popular().index(meme) + 1,
+            'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
+        }
+
+        if type(pub) == Meme:
+            content.append(cont)
+        else:
+            content.append({
+                'type': 'repost',
+                'id': str(meme.id),
+                'delete': uid == pub.user or ses.query(User).get(uid).role != ROLES.index('user'),
+                'author_name': pub.user_.alias,
+                'date': str(pub.publication_date.date()),
+                'author_id': pub.user,
+                'author_img': url_for('static', filename=f'img/avatars/{pub.user_.avatar}'),
+                'reposted_content': cont
+            })
+
+    return jsonify(dict(content=content))

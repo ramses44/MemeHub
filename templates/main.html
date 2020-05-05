@@ -86,7 +86,7 @@
                     </div>
                     <div class="up_data_block">
                         <div class="up_data_block_part1">Место в топе</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
+                        <div class="up_data_block_part2">{{ data['user_page']['top'] }}</div>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,10 @@
     {% endif %}
 </div>
 {% endfor %}
-<div class="meme_block load_button">Загузить ещё</div>
+
+{% if data['load_more'] %}
+    <div class="meme_block load_button">Загузить ещё</div>
+{% endif %}
 
 
 <script>
