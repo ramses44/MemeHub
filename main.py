@@ -280,7 +280,8 @@ def user_page(username_id):
                 user.avatar = fn
 
             session.commit()
-    data = gen_data()
+    data = gen_data(do_get_content=False)
+    data['content'] = get_user_content(username_id).json['content']
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
     return render_template('main.html', data=data, title=data['user_page']['username'], form=form, form2=form2)

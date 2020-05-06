@@ -1,231 +1,265 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if data['user_page']['is_page'] %}
+    {% if data['user_page']['is_page'] %}
 
-<div class="meme_block">
-    <form method="post" novalidate enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        {% if data['user_page']['error_message'] %}
-            <div class="error_message">{{ data['user_page']['error_message'] }}</div>
-        {% endif %}
-        <div class="head_block">
-            <div class="img_sub_block">
-                <div class="img_block">
-                    {% if data['user_page']['type'] == 'me' %}
-                        <div class="up_img_text" onclick="document.getElementById('img-input').click()">Обновить фотографию</div>
-                        <img src="{{ data['user_page']['user_img'] }}" class="up_img">
-                    {% else %}
-                        <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
-                    {% endif %}
-                </div>
-                <div class="sub_block">
-                    {% if data['user_page']['type'] != 'me' %}
-                        {% if data['user_page']['is_sub'] %}
-                            <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы подписаны</div>
-                        {% else %}
-                            <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">Подписаться</div>
-                        {% endif %}
-                    {% endif %}
-                    {% if data['info']['role'] == 'admin' and data['user_page']['role'] != 'admin' %}
-                        {% if data['user_page']['is_block'] %}
-                            <div class="sub_button block_button_true" id="block-button" onclick="block_click()">Разблокировать</div>
-                        {% else %}
-                            <div class="sub_button block_button_false" id="block-button" onclick="block_click()">Заблокировать</div>
-                        {% endif %}
-                    {% endif %}
-                    {% if data['user_page']['type'] == 'me' or data['info']['role'] != 'admin' %}
-                        <style type="text/css">
-                            .head_block {
-                                height: 236px;
-                            }
-                        </style>
-                    {% endif %}
-                    {% if data['user_page']['type'] == 'me' and data['info']['role'] != 'admin' %}
-                        <style type="text/css">
-                            .head_block {
-                                height: 200px;
-                            }
-                        </style>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="username_block">
-                <div class="up_role">
-                    {% if data['user_page']['role'] %}
-                        <div class="admin_role">{{ data['user_page']['role'] }}</div>
-                    {% endif %}
-                </div>
-                {% if data['user_page']['type'] == 'me' %}
-                    <div class="up_text_block up_username_div">
-                        {{ form.alias(value=data['user_page']['username'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_username", autocomplete="off", maxlength=25) }}
-                    </div>
-                    <div class="up_text_block up_status_div">
-                        {{ form.about(rows=5, value=data['user_page']['status'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_status up_text_block_input2", autocomplete="off", maxlength=40) }}
-                    </div>
-                {% else %}
-                    <div class="up_text_block_other up_username_div_other">
-                        <div class="up_text_block_input_other up_username_other">{{ data['user_page']['username'] }}</div>
-                    </div>
-                    <div class="up_text_block_other up_status_div_other">
-                        <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ data['user_page']['status'] }}</div>
-                    </div>
+        <div class="meme_block">
+            <form method="post" novalidate enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {% if data['user_page']['error_message'] %}
+                    <div class="error_message">{{ data['user_page']['error_message'] }}</div>
                 {% endif %}
-                <div class="info_block">
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Подписчики</div>
-                        <div class="up_data_block_part2" id="subs-number">{{ data['user_page']['subs'] }}</div>
+                <div class="head_block">
+                    <div class="img_sub_block">
+                        <div class="img_block">
+                            {% if data['user_page']['type'] == 'me' %}
+                                <div class="up_img_text" onclick="document.getElementById('img-input').click()">Обновить
+                                    фотографию
+                                </div>
+                                <img src="{{ data['user_page']['user_img'] }}" class="up_img">
+                            {% else %}
+                                <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
+                            {% endif %}
+                        </div>
+                        <div class="sub_block">
+                            {% if data['user_page']['type'] != 'me' %}
+                                {% if data['user_page']['is_sub'] %}
+                                    <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы
+                                        подписаны
+                                    </div>
+                                {% else %}
+                                    <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">
+                                        Подписаться
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            {% if data['info']['role'] == 'admin' and data['user_page']['role'] != 'admin' %}
+                                {% if data['user_page']['is_block'] %}
+                                    <div class="sub_button block_button_true" id="block-button" onclick="block_click()">
+                                        Разблокировать
+                                    </div>
+                                {% else %}
+                                    <div class="sub_button block_button_false" id="block-button"
+                                         onclick="block_click()">Заблокировать
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            {% if data['user_page']['type'] == 'me' or data['info']['role'] != 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 236px;
+                                    }
+                                </style>
+                            {% endif %}
+                            {% if data['user_page']['type'] == 'me' and data['info']['role'] != 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 200px;
+                                    }
+                                </style>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Публикации</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['posts'] }}</div>
-                    </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Рейтинг</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
-                    </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Место в топе</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['top'] }}</div>
+                    <div class="username_block">
+                        <div class="up_role">
+                            {% if data['user_page']['role'] %}
+                                <div class="admin_role">{{ data['user_page']['role'] }}</div>
+                            {% endif %}
+                        </div>
+                        {% if data['user_page']['type'] == 'me' %}
+                            <div class="up_text_block up_username_div">
+                                {{ form.alias(value=data['user_page']['username'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_username", autocomplete="off", maxlength=25) }}
+                            </div>
+                            <div class="up_text_block up_status_div">
+                                {{ form.about(rows=5, value=data['user_page']['status'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_status up_text_block_input2", autocomplete="off", maxlength=40) }}
+                            </div>
+                        {% else %}
+                            <div class="up_text_block_other up_username_div_other">
+                                <div class="up_text_block_input_other up_username_other">{{ data['user_page']['username'] }}</div>
+                            </div>
+                            <div class="up_text_block_other up_status_div_other">
+                                <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ data['user_page']['status'] }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="info_block">
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Подписчики</div>
+                                <div class="up_data_block_part2" id="subs-number">{{ data['user_page']['subs'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Публикации</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['posts'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Рейтинг</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Место в топе</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['top'] }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div>
+                    {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click();", style="display: none;") }}
+                </div>
+
+                <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
+            </form>
         </div>
 
-        <div>
-            {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click();", style="display: none;") }}
-        </div>
+        {% if data['user_page']['type'] == "me" and not data['user_page']['is_block'] %}
+            {% include "meme_adding.html" %}
+        {% endif %}
 
-        <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
-    </form>
-</div>
-
-{% if data['user_page']['type'] == "me" and not data['user_page']['is_block'] %}
-   {% include "meme_adding.html" %}
-{% endif %}
-
-{% endif %}
-
-{% for meme in data['content'] %}
-<div class="meme_block" id="meme_block_{{ meme['id'] }}">
-    {% if meme['place'] %}
-        <div class="place">{{ meme['place'] }}</div>
     {% endif %}
-    <div class="author">
-        <div class="test">
-            <a href="/author/{{ meme["author_id"] }}"><img src={{ meme["author_img"] }} class="author_img"></a>
-            <div class="author_name"><a href="/author/{{ meme["author_id"] }}">{{ meme["author_name"] }}</a></div>
-            <div class="meme_date">{{ meme["date"] }}</div>
-        </div>
-    </div>
-    {% if meme['type'] == 'meme' %}
-        {% if meme["note"] %}
-            <div class="note">{{ meme["note"] }}</div>
-        {% endif %}
-        <img src={{ meme["meme_img"] }} class="meme_img">
-        {% if data['info']['is_auth'] %}
-            <div class="likes_block">
-                {% if meme["is_liked"] %}
-                    {% set liked = "like_btn_1" %}
-                {% else %}
-                    {% set liked = "like_btn_0" %}
-                {% endif %}
-                {% if meme["is_reposted"] %}
-                    {% set reposted = "repost_btn_1" %}
-                {% else %}
-                    {% set reposted = "repost_btn_0" %}
-                {% endif %}
-                <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn" onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme["id"] }});' id="l{{ meme["id"] }}">
-                <div class="lr_number" id="ln{{ meme["id"] }}">{{ meme["likes"] }}</div>
-                <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme["id"] }});' id="r{{ meme["id"] }}">
-                <div class="lr_number" id="rn{{ meme["id"] }}">{{ meme["reposts"] }}</div>
-                {% if meme["delete"] %}
-                    <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-                {% endif %}
-            </div>
-        {% else %}
-            <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>, чтобы получить возможность лайкать и репостить публикации</div>
-        {% endif %}
-        <div class="category">
-            {% for tag in meme['category'] %}
-                <a href="/search/~{{ tag }}">#{{ tag }}{% if not loop.last %}, {% endif %}</a>
-            {% endfor %}
-        </div>
-    {% else %}
-        {% set meme_r = meme['reposted_content'] %}
 
-        <div class="meme_block margin_top" id="meme_block_{{ meme['id'] }}">
-            {% if meme_r['place'] %}
-                <div class="place">{{ meme_r['place'] }}</div>
+    {% for meme in data['content'] %}
+        <div class="meme_block" id="meme_block_{{ meme['id'] }}">
+            {% if meme['place'] %}
+                <div class="place">{{ meme['place'] }}</div>
             {% endif %}
             <div class="author">
                 <div class="test">
-                    <a href="/author/{{ meme_r["author_id"] }}"><img src={{ meme_r["author_img"] }} class="author_img"></a>
-                    <div class="author_name"><a href="/author/{{ meme_r["author_id"] }}">{{ meme_r["author_name"] }}</a></div>
-                    <div class="meme_date">{{ meme_r["date"] }}</div>
+                    <a href="/author/{{ meme["author_id"] }}"><img src={{ meme["author_img"] }} class="author_img"></a>
+                    <div class="author_name"><a href="/author/{{ meme["author_id"] }}">{{ meme["author_name"] }}</a>
+                    </div>
+                    <div class="meme_date">{{ meme["date"] }}</div>
                 </div>
             </div>
-            {% if meme_r["note"] %}
-                <div class="note">{{ meme_r["note"] }}</div>
-            {% endif %}
-            <img src={{ meme_r["meme_img"] }} class="meme_img">
-            {% if data['info']['is_auth'] %}
-                <div class="likes_block">
-                    {% if meme_r["is_liked"] %}
-                        {% set liked = "like_btn_1" %}
-                    {% else %}
-                        {% set liked = "like_btn_0" %}
-                    {% endif %}
-                    {% if meme_r["is_reposted"] %}
-                        {% set reposted = "repost_btn_1" %}
-                    {% else %}
-                        {% set reposted = "repost_btn_0" %}
-                    {% endif %}
-                    <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn" onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme_r["id"] }});' id="l{{ meme_r["id"] }}_r">
-                    <div class="lr_number" id="ln{{ meme_r["id"] }}_r">{{ meme_r["likes"] }}</div>
-                    <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme_r["id"] }});' id="r{{ meme_r["id"] }}_r">
-                    <div class="lr_number" id="rn{{ meme_r["id"] }}_r">{{ meme_r["reposts"] }}</div>
-                    {% if meme_r["delete"] %}
-                        <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-                    {% endif %}
+            {% if meme['type'] == 'meme' %}
+                {% if meme["note"] %}
+                    <div class="note">{{ meme["note"] }}</div>
+                {% endif %}
+                <img src={{ meme["meme_img"] }} class="meme_img">
+                {% if data['info']['is_auth'] %}
+                    <div class="likes_block">
+                        {% if meme["is_liked"] %}
+                            {% set liked = "like_btn_1" %}
+                        {% else %}
+                            {% set liked = "like_btn_0" %}
+                        {% endif %}
+                        {% if meme["is_reposted"] %}
+                            {% set reposted = "repost_btn_1" %}
+                        {% else %}
+                            {% set reposted = "repost_btn_0" %}
+                        {% endif %}
+                        <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn"
+                             onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme["id"] }});'
+                             id="l{{ meme["id"] }}">
+                        <div class="lr_number" id="ln{{ meme["id"] }}">{{ meme["likes"] }}</div>
+                        <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn"
+                             onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme["id"] }});'
+                             id="r{{ meme["id"] }}">
+                        <div class="lr_number" id="rn{{ meme["id"] }}">{{ meme["reposts"] }}</div>
+                        {% if meme["delete"] %}
+                            <div class="delete_btn"
+                                 onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>
+                                Удалить публикацию
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>,
+                        чтобы получить возможность лайкать и репостить публикации
+                    </div>
+                {% endif %}
+                <div class="category">
+                    {% for tag in meme['category'] %}
+                        <a href="/search/~{{ tag }}">#{{ tag }}{% if not loop.last %}, {% endif %}</a>
+                    {% endfor %}
                 </div>
             {% else %}
-                <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>, чтобы получить возможность лайкать и репостить публикации</div>
+                {% set meme_r = meme['reposted_content'] %}
+
+                <div class="meme_block margin_top" id="meme_block_{{ meme['id'] }}">
+                    {% if meme_r['place'] %}
+                        <div class="place">{{ meme_r['place'] }}</div>
+                    {% endif %}
+                    <div class="author">
+                        <div class="test">
+                            <a href="/author/{{ meme_r["author_id"] }}"><img
+                                    src={{ meme_r["author_img"] }} class="author_img"></a>
+                            <div class="author_name"><a
+                                    href="/author/{{ meme_r["author_id"] }}">{{ meme_r["author_name"] }}</a></div>
+                            <div class="meme_date">{{ meme_r["date"] }}</div>
+                        </div>
+                    </div>
+                    {% if meme_r["note"] %}
+                        <div class="note">{{ meme_r["note"] }}</div>
+                    {% endif %}
+                    <img src={{ meme_r["meme_img"] }} class="meme_img">
+                    {% if data['info']['is_auth'] %}
+                        <div class="likes_block">
+                            {% if meme_r["is_liked"] %}
+                                {% set liked = "like_btn_1" %}
+                            {% else %}
+                                {% set liked = "like_btn_0" %}
+                            {% endif %}
+                            {% if meme_r["is_reposted"] %}
+                                {% set reposted = "repost_btn_1" %}
+                            {% else %}
+                                {% set reposted = "repost_btn_0" %}
+                            {% endif %}
+                            <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn"
+                                 onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme_r["id"] }});'
+                                 id="l{{ meme_r["id"] }}_r">
+                            <div class="lr_number" id="ln{{ meme_r["id"] }}_r">{{ meme_r["likes"] }}</div>
+                            <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn"
+                                 onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme_r["id"] }});'
+                                 id="r{{ meme_r["id"] }}_r">
+                            <div class="lr_number" id="rn{{ meme_r["id"] }}_r">{{ meme_r["reposts"] }}</div>
+                            {% if meme_r["delete"] %}
+                                <div class="delete_btn"
+                                     onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>
+                                    Удалить публикацию
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>,
+                            чтобы получить возможность лайкать и репостить публикации
+                        </div>
+                    {% endif %}
+                    <div class="category">{{ meme_r['category'] }}</div>
+                </div>
+                <div class="likes_block">
+                    {% if meme["delete"] %}
+                        <div class="delete_btn"
+                             onclick='post("/post", "{\"type\":\"delete_repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>
+                            Удалить публикацию
+                        </div>
+                    {% endif %}
+                </div>
             {% endif %}
-            <div class="category">{{ meme_r['category'] }}</div>
         </div>
-        <div class="likes_block">
-            {% if meme["delete"] %}
-                <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete_repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-            {% endif %}
-        </div>
+    {% endfor %}
+
+    {% if data['load_more'] %}
+        <div class="meme_block load_button">Загузить ещё</div>
     {% endif %}
-</div>
-{% endfor %}
-
-{% if data['load_more'] %}
-    <div class="meme_block load_button">Загузить ещё</div>
-{% endif %}
 
 
-<script>
-    function post(url, data, callback) {
-        try {
-             var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
-             req.open('POST', url, 1);
-             req.setRequestHeader('Content-type', 'application/json');
-             req.send(data)
-         } catch (e) {
-             window.console && console.log(e);
-         }
+    <script>
+        function post(url, data, callback) {
+            try {
+                var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                req.open('POST', url, 1);
+                req.setRequestHeader('Content-type', 'application/json');
+                req.send(data)
+            } catch (e) {
+                window.console && console.log(e);
+            }
         }
 
-    function reload() {
-        window.location.reload()
-    }
+        function reload() {
+            window.location.reload()
+        }
     </script>
 
-<script>
+    <script>
         function changeImage1(meme_id) {
 
             if ({{ data['user_page']['is_block'] }}) {
@@ -233,21 +267,19 @@
                 return;
             }
 
-            if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png")
-            {
+            if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
                 document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
                 document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
                 document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
                 document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
-            }
-            else
-            {
+            } else {
                 document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
                 document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
                 document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
                 document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
             }
         }
+
         function changeImage2(meme_id) {
 
             if ({{ data['user_page']['is_block'] }}) {
@@ -255,15 +287,12 @@
                 return;
             }
 
-            if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png")
-            {
+            if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
                 document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
                 document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
                 document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
                 document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
-            }
-            else
-            {
+            } else {
                 document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
                 document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
                 document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
@@ -282,7 +311,7 @@
             post("/post", "{\"target_id\":\"" + meme_id + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"delete\"}");
         }
 
-        function sub_click(){
+        function sub_click() {
 
             if ({{ data['user_page']['is_block'] }}) {
                 alert('Ваш аккаунт заблокирован администрацией! Вы не можете взаимодействовать с другими пользователями');
@@ -295,9 +324,7 @@
                 document.getElementById("sub-button").classList.add("sub_button_false");
                 document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) - 1;
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
-            }
-            else
-            {
+            } else {
                 document.getElementById("sub-button").innerHTML = "Вы подписаны";
                 document.getElementById("sub-button").classList.remove("sub_button_false");
                 document.getElementById("sub-button").classList.add("sub_button_true");
@@ -306,15 +333,13 @@
             }
         }
 
-        function block_click(){
+        function block_click() {
             if (document.getElementById("block-button").innerHTML == "Разблокировать") {
                 document.getElementById("block-button").innerHTML = "Заблокировать";
                 document.getElementById("block-button").classList.remove("block_button_true");
                 document.getElementById("block-button").classList.add("block_button_false");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unblock\"}");
-            }
-            else
-            {
+            } else {
                 document.getElementById("block-button").innerHTML = "Разблокировать";
                 document.getElementById("block-button").classList.remove("block_button_false");
                 document.getElementById("block-button").classList.add("block_button_true");
@@ -322,41 +347,41 @@
             }
         }
 
-        var input = document.getElementById( 'input_meme' );
-        var infoArea = document.getElementById( 'div_meme' );
-        input.addEventListener( 'change', showFileName );
+        var input = document.getElementById('input_meme');
+        var infoArea = document.getElementById('div_meme');
+        input.addEventListener('change', showFileName);
 
-        function showFileName( event ) {
+        function showFileName(event) {
             var input = event.srcElement;
             var fileName = input.files[0].name;
             infoArea.textContent = fileName;
         }
 
-        function preview_image(event)
-        {
+        function preview_image(event) {
             var reader = new FileReader();
-            reader.onload = function()
-            {
+            reader.onload = function () {
                 var output = document.getElementById('img_meme');
                 output.src = reader.result;
             }
             reader.readAsDataURL(event.target.files[0]);
         }
 
-</script>
+    </script>
 
- <script>
-            var verified = [];
-            var max_tags_count = 5;
-            document.querySelector('select').onchange = function(e) {
-                if (this.querySelectorAll('option:checked').length <= max_tags_count) {
-                    verified = Array.apply(null, this.querySelectorAll('option:checked'));
-                } else {
-                    Array.apply(null, this.querySelectorAll('option')).forEach(function(e) {
-                     e.selected = verified.indexOf(e) > -1;
-                    });
-                }
+    <script>
+        var verified = [];
+        var max_tags_count = 5;
+        document.querySelector('select').onchange = function (e) {
+            if (this.querySelectorAll('option:checked').length <= max_tags_count) {
+                verified = Array.apply(null, this.querySelectorAll('option:checked'));
+            } else {
+                Array.apply(null, this.querySelectorAll('option')).forEach(function (e) {
+                    e.selected = verified.indexOf(e) > -1;
+                });
             }
-        </script>
+        }
+    </script>
+
+
 
 {% endblock %}

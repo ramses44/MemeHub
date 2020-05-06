@@ -131,3 +131,52 @@ def do_search(data, uid=0):
             })
 
     return jsonify(dict(content=content))
+
+
+@blueprint.route('/user_content/<int:uid>', methods=['POST'])
+def get_user_content(uid):
+
+    try:
+        k = (request.json['k'])
+    except TypeError:
+        k = 0
+
+    ses = db_session.create_session()
+    content = []
+    for pub in meme_selector.get_user_pubs(uid, k):
+        meme = pub if type(pub) == Meme else pub.meme_
+        cont = {
+            'type': 'meme',
+            'id': str(meme.id),
+            'author_name': meme.author_.alias,
+            'author_id': meme.author,
+            'author_img': url_for('static', filename=f'img/avatars/{meme.author_.avatar}'),
+            'date': str(meme.publication_date.date()),
+            'note': meme.title,
+            'meme_img': url_for('static', filename=f'img/memes/{meme.picture}'),
+            'likes': len(list(meme.likes)),
+            'reposts': len(list(meme.repostes)),
+            'is_liked': uid in map(lambda x: x.id, meme.likes),
+            'is_reposted': uid in map(lambda x: x.id, meme.repostes),
+            'category': list(map(lambda x: x.title, meme.tags)),
+            'place': meme_selector.get_most_popular().index(meme) + 1,
+            'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
+        }
+
+        if type(pub) == Meme:
+            content.append(cont)
+        else:
+            content.append({
+                'type': 'repost',
+                'id': str(meme.id),
+                'delete': uid == pub.user or ses.query(User).get(uid).role != ROLES.index('user'),
+                'author_name': pub.user_.alias,
+                'date': str(pub.publication_date.date()),
+                'author_id': pub.user,
+                'author_img': url_for('static', filename=f'img/avatars/{pub.user_.avatar}'),
+                'reposted_content': cont
+            })
+
+    return jsonify(dict(content=content))
+
+
