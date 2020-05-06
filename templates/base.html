@@ -8,6 +8,7 @@
         <link rel="stylesheet" type="text/css" href="../../static/css/reg_log_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/user_page_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/publish_css.css">
+        <link rel="stylesheet" type="text/css" href="../../static/css/subscribes_css.css">
         <!--
         <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -50,10 +51,16 @@
                     <div class="menu_section" onClick="window.location='/'">Главная</div>
                     {% if data['info']['is_auth'] %}
                         <div class="menu_section" onClick="window.location='/me'">Моя страница</div>
+                        <div class="menu_section" onClick="window.location='/subscribed'">Подписки</div>
                     {% endif %}
                     <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
                     <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
                 </div>
+                {% if data['info']['role'] == 'admin' %}
+                    <div class="menu_block menu_block1">
+                        <div class="menu_section" onClick="window.location='/addtag'">Редактировать теги</div>
+                    </div>
+                {% endif %}
             </div>
             <div class="center_block">
                 {% block content %}{% endblock %}

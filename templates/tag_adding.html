@@ -1,23 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1>Добавить тег</h1>
-        <form method="post" novalidate>
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.title.label }}<br>
-                {{ form.title(class="form-control") }}<br>
+
+    <div class="meme_block fixed_block">
+        <div class="publish_block">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="pub_head">Редактировать теги</div>
+
+                <div class="pub_notes">Тег</div>
+                <div class="pub_input_div">
+                    {{ form.title(autocomplete="off", maxlength=20, class="pub_input") }}
+                </div>
                 {% for error in form.title.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
+                    <div class="pub_error_note">{{ error }}</div>
                 {% endfor %}
-            </p>
 
-            <p>{{ form.submit(type="submit", class="btn btn-outline-primary") }}</p>
+                <div class="pub_btn_grp">
+                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Добавить</div>
+                </div>
+                {{ form.submit(type="submit", class="btn btn-outline-primary", style="display: none;", id="publish-submit") }}
 
-        </form>
+                <div class="pub_notes">Удалить теги</div>
+                <div class="pub_tags">
+                    {% for tag in data['tags'] %}
+                        <div class="pub_tag" id="tag_{{ tag }}" onclick="delete_tag('tag_{{ tag }}');">{{ tag }}</div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
     </div>
+
+    <script>
+        function delete_tag(id)
+        {
+            document.getElementById(id).remove();
+            post("/post", "{\"type\":\"delete_tag\", \"target\": \"" + id + "\"}");
+        }
+
+        function post(url, data, callback)
+        {
+            try
+            {
+                var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                req.open('POST', url, 1);
+                req.setRequestHeader('Content-type', 'application/json');
+                req.send(data)
+            }
+            catch (e)
+            {
+                window.console && console.log(e);
+            }
+        }
+
+    </script>
 
 {% endblock %}

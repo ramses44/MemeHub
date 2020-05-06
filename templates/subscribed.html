@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="meme_block fixed_block">
+        <div class="publish_block">
+            <div class="pub_head">Подписки</div>
+            {% if not data['subscribes'] %}
+                 <div class="pub_notes">Вы ни на кого не подписаны</div>
+            {% endif %}
+            {% for user in data['subscribes'] %}
+                <div class="subs_block" id="subs_{{ user["id"] }}">
+                    <div class="subs_user_block" onClick="window.location='/author/{{ user["id"] }}"'">
+                        <img src="{{ user['avatar'] }}" class="subs_img">
+                        <div class="subs_username">{{ user['username'] }}</div>
+                    </div>
+                    <div class="subs_button" onclick="unsub_click('{{ user["id"] }}', 'subs_{{ user["id"] }}');">Отписаться</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function unsub_click(user_id, block_id)
+        {
+            document.getElementById(block_id).remove();
+            post("/post", "{\"target_id\":\"" + user_id + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
+        }
+
+        function post(url, data, callback)
+        {
+            try
+            {
+                var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                req.open('POST', url, 1);
+                req.setRequestHeader('Content-type', 'application/json');
+                req.send(data)
+            }
+            catch (e)
+            {
+                window.console && console.log(e);
+            }
+        }
+    </script>
+
+{% endblock %}

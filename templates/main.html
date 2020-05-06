@@ -103,7 +103,7 @@
 {% if data['user_page']['type'] == "me" %}
     <div class="meme_block">
         <div class="publish_block">
-            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';">
+            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';" name="my">
                 {{ form2.hidden_tag() }}
                 <div class="pub_head">Новая публикация</div>
                 <div class="pub_notes">Комментарий</div>
@@ -111,8 +111,11 @@
                     {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
                 </div>
                 <div class="pub_notes">Теги</div>
-                <div class="pub_input_div">
-                    {{ form2.tags(autocomplete="off", maxlength=40, class="pub_input") }}
+                {{ form2.tags(autocomplete="off", id="tags_input", style="display: none;") }}
+                <div class="pub_tags">
+                    {% for tag in data['user_page']['tags'] %}
+                        <div class="pub_tag" id="tag_{{ tag }}" onclick="click_tag('tag_{{ tag }}');">{{ tag }}</div>
+                    {% endfor %}
                 </div>
                 <div class="pub_btn_grp">
                     <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
@@ -120,7 +123,7 @@
                 </div>
                 <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
                 <div class="pub_btn_grp">
-                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click();">Опубликовать</div>
+                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click(); clean_tags();">Опубликовать</div>
                 </div>
                 {{ form2.img(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
                 {{ form2.submit(type="submit", style="display: none;", id="publish-submit") }}
@@ -217,7 +220,7 @@
         </div>
         <div class="likes_block">
             {% if meme["delete"] %}
-                <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete_repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
+                <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
             {% endif %}
         </div>
     {% endif %}
@@ -339,6 +342,45 @@
                 output.src = reader.result;
             }
             reader.readAsDataURL(event.target.files[0]);
+        }
+
+        var tags_number = 0;
+        let tags_arr = [];
+        function click_tag(tag_id)
+        {
+            if (document.getElementById(tag_id).classList.contains('pub_pressed'))
+            {
+                document.getElementById(tag_id).classList.remove('pub_pressed');
+                tags_number--;
+                var index = tags_arr.indexOf(document.getElementById(tag_id).innerHTML);
+                if (index !== -1)
+                {
+                    tags_arr.splice(index, 1);
+                }
+                create_tags();
+            }
+            else
+            {
+                if (tags_number < 5)
+                {
+                    document.getElementById(tag_id).classList.add('pub_pressed');
+                    tags_number++;
+                    tags_arr[tags_arr.length] = document.getElementById(tag_id).innerHTML;
+                    create_tags();
+                }
+            }
+        }
+
+        function create_tags()
+        {
+            document.getElementById('tags_input').value = tags_arr.join(' ');
+        }
+
+        function clean_tags()
+        {
+            var tags_number = 0;
+            let tags_arr = [];
+            // location.reload();
         }
 
 </script>

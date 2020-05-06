@@ -118,6 +118,15 @@ def get_user_page_data(username_id):
             data['type'] = 'other'
     else:
         data['type'] = 'other'
+    u1 = session.query(User).get(current_user.get_id())
+    if user in u1.subscribed:
+        data['is_sub'] = True
+    else:
+        data['is_sub'] = False
+    data['subs'] = len([i for i in session.query(User).all() if user in i.subscribed])
+    data['posts'] = (len(list(session.query(Meme).filter(Meme.author == username_id))) +
+                     len(list(session.query(Repost).filter(Repost.user == username_id))))
+    data['top'] = list(session.query(User).order_by(User.rating))[::-1].index(user) + 1
     return data
 
 
@@ -204,7 +213,39 @@ def post():
     # или id пользователя, на которого подписались/отписались
     # или id пользователя, которого заблокировали/разблокировали
     if request:
-        print(request.json)
+        req = request.json
+        session = db_session.create_session()
+        if req['type'] == 'like':  # обработка лайков
+            user = session.query(User).filter(User.id == req['user_id']).first()
+            target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            if target in user.liked:
+                user.liked.remove(target)
+            else:
+                user.liked.append(target)
+        elif req['type'] == 'repost':  # обработка репостов
+            pass
+        elif req['type'] == 'delete':  # обработка запросов на удаление мемов
+            target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            # удаление лайков
+            for i in target.likes:
+                i.liked.remove(target)
+            # удаление тегов
+
+            # удаление мема
+            session.query(Meme).filter(Meme.id == req['target_id']).delete()
+        elif req['type'] == 'sub' or req['type'] == 'unsub':  # обработка подписок
+            u1 = session.query(User).get(current_user.get_id())
+            u2 = session.query(User).get(req['target_id'])
+            if u2 in u1.subscribed:
+                u1.subscribed.remove(u2)
+            else:
+                u1.subscribed.append(u2)
+        elif req['type'] == 'block' or req['type'] == 'unblock':  # обработка блокировок
+            pass
+        elif req['type'] == 'delete_tag':  # обработка запросов на удаление тегов
+            tag = req['target'][4:]
+            session.query(Tag).filter(Tag.title == tag).delete()
+        session.commit()
     return 'qwerty'
 
 
@@ -222,7 +263,25 @@ def user_page(username_id):
             print(form2.note.data)
             print(form2.tags.data)
             print(form2.img.data)
-            pass
+
+            session = db_session.create_session()
+
+            # Сохраняем картинку
+            filename = secure_filename(form2.img.data.filename)
+            fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
+            form2.img.data.save('static/img/memes/' + fn)
+
+            # Создаём мем
+            meme = Meme(
+                title=form2.note.data,
+                tags=[session.query(Tag).filter(Tag.title == i).first() for i in form2.tags.data.split()],
+                author=current_user.get_id(),
+                picture=fn
+            )
+
+            # Сохраняем
+            session.add(meme)
+            session.commit()
 
     if form.validate_on_submit():
         if not(form.alias.data == '' and form.about.data == '' and form.avatar.data is None):
@@ -263,6 +322,10 @@ def user_page(username_id):
     data = gen_data()
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
+
+    session = db_session.create_session()
+    data['user_page']['tags'] = [i.title for i in session.query(Tag).all()]
+
     return render_template('main.html', data=data, title=data['user_page']['username'], form=form, form2=form2)
 
 
@@ -352,6 +415,8 @@ def addtag():
     """Механизм добавления тега"""
     form = TagAddingForm()
     sess = db_session.create_session()
+    data = gen_data()
+    data['tags'] = [i.title for i in sess.query(Tag).all()]
 
     if not current_user.is_authenticated:
         # Если пользователь не вошёл в систему, кидаем ошибку
@@ -372,7 +437,17 @@ def addtag():
 
     else:
         # GET-запрос
-        return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=DATA)
+
+        return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=data)
+
+
+@app.route('/subscribed', methods=['GET', 'POST'])
+def subscribed():
+    """Страница подписок"""
+    session = db_session.create_session()
+    data = gen_data()
+    data['subscribes'] = [i.get_info() for i in load_user(current_user.id).subscribed]
+    return render_template('subscribed.html', title='Добавить тег', current_user=current_user, data=data)
 
 
 @app.route('/addmeme', methods=['POST', 'GET'])

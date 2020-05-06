@@ -55,10 +55,13 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                 'status': self.about,
                 'subs': 666,
                 'posts': 666,
-                'rating': 666,
+                'rating': self.rating,
                 'top': 666,
                 'username': self.alias,
                 'user_id': self.id,
                 'error_message': '',
                 'is_sub': False,
                 'is_block': False}
+
+    def get_info(self):
+        return {'username': self.alias, 'avatar': '../../static/img/avatars/' + self.avatar, 'id': self.id}
