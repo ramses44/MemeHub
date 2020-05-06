@@ -98,7 +98,6 @@ def gen_data(do_get_content=True):
         res = {}
 
     res['user_page'] = dict(is_page=False)
-    res['load_more'] = True
     res['info'] = info  # Совмещаем данные в один словарь
 
     return res  # Возвращаем его
@@ -137,6 +136,7 @@ def top_memes():
     res = gen_data(do_get_content=False)
     res['load_more'] = False
     res['content'] = content
+    res['type'] = 'top'
 
     return render_template('main.html', data=res, title='Топ мемов')
 
@@ -164,6 +164,7 @@ def search(text):
 
     data = gen_data(do_get_content=False)
     data['content'] = do_search(text, int(current_user.get_id())).json['content']
+    data['type'] = 'search - ' + text
 
     return render_template('main.html', data=data, title='Поиск: ' + text)
 
@@ -192,6 +193,7 @@ def index():
     """Главная страница"""
 
     data = gen_data()
+    data['type'] = 'main'
     with open('data.json', 'w') as f:
         print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
@@ -409,4 +411,4 @@ def get_my_profile():
 
 
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    app.run(port=1604, host='192.168.0.103')

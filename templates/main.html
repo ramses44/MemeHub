@@ -237,9 +237,7 @@
         </div>
     {% endfor %}
 
-    {% if data['load_more'] %}
-        <div class="meme_block load_button">Загузить ещё</div>
-    {% endif %}
+    <div class="meme_block load_button" id="load_more">Загузить ещё</div>
 
 
     <script>
@@ -382,6 +380,223 @@
         }
     </script>
 
+    <script>
+        var k = 0;
+        function load_more() {
+            var req = new XMLHttpRequest();
+            {% if data['type'] == 'main' %}
+                req.open("GET", "/get_content/{{ data['info']['id'] if data['info'] else 0 }}");
+                req.send();
+                if (req.status === 200) {
+                    var cont = req.response['content'];
+                    if (cont === []) document.getElementById("load_more").remove();
+                    else {
 
+                    }
+                }
+        }
+
+    </script>
+
+    <script>
+        function add_cont(cont) {
+            var meme = document.createElement('div');
+
+            meme.className = "meme_block";
+
+            meme.id = "meme_block_" + cont['id'].toString();
+
+                if (cont['place']) {
+                    var place = document.createElement('div');
+                    place.className = "place";
+                    place.innerText = cont['place'];
+            meme.append(place);
+                }
+
+                var author = document.createElement('div');
+                author.className = "author";
+                    var test = document.createElement('div');
+                    test.className = "test";
+                        var a = document.createElement('a');
+                        a.href = "/author/" + cont['author_id'];
+                            var img = document.createElement('img');
+                            img.src = cont['author_img'];
+                            img.className = "author_img";
+                        a.append(img);
+                        var a_name = document.createElement('div');
+                        a_name.className = "author_name";
+                            var aa = document.createElement('a');
+                            aa.href = "/author/" + cont['author_id'];
+                            aa.innerText = cont['author_name'];
+                        a_name.append(aa);
+                        var date = document.createElement('div');
+                        date.className = "meme_date";
+                        date.innerText = cont['date'];
+                    test.append(a);
+                    test.append(a_name);
+                    test.append(date);
+                author.append(test);
+            meme.append(author);
+
+                if(cont['type'] === "meme") {
+                    if(cont['note'] !== "") {
+                        var note = document.createElement('div');
+                        note.className = "note";
+                        note.innerText = cont['note'];
+            meme.append(note);
+                    }
+                    var img2 = document.createElement('img');
+                    img2.src = cont['meme_img'];
+                    img2.className = 'meme_img';
+            meme.append(img);
+
+                    if (cont['info']['is_auth']) {
+                        var likes_block = document.createElement('div');
+                        likes_block.className = "likes_block";
+
+                        if (cont['is_liked']) var liked = "like_btn_1";
+                        else var liked = "like_btn_0";
+
+                        if (cont['is_reposted']) var reposted = "repost_btn_1";
+                        else var reposted = "repost_btn_0";
+
+                            var like_img = document.createElement('img');
+                            like_img.src = "http://127.0.0.1:8080/static/img/interface/" + liked + ".png";
+                            like_img.className = "like_btn";
+                            like_img.onclick = 'post("/post", "{"type":"like", "target_id":"' + cont['id'] +
+                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage1(' + cont['id'] + ');';
+                            like_img.id = "l" + cont['id'];
+
+                        likes_block.append(like_img);
+
+                            var like_num = document.createElement('div');
+                            like_num.className = "lr_number";
+                            like_num.id = "ln" + cont['id'];
+                            like_num.innerText = cont['likes'];
+
+                        likes_block.append(like_num);
+
+                            var rep_img = document.createElement('img');
+                            rep_img.src = "http://127.0.0.1:8080/static/img/interface/" + reposted + ".png";
+                            rep_img.className = "repost_btn";
+                            rep_img.onclick = 'post("/post", "{"type":"repost", "target_id":"' + cont['id'] +
+                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage2(' + cont['id'] + ');';
+                            rep_img.id = "r" + cont['id'];
+
+                        likes_block.append(rep_img);
+
+                            var rep_num = document.createElement('div');
+                            rep_num.className = "lr_number";
+                            rep_num.id = "rn" + cont['id'];
+                            rep_num.innerText = cont['reposts'];
+
+                        likes_block.append(rep_num);
+
+                            if (cont['delete']) {
+                                var del = document.createElement('div');
+                                del.className = "delete_btn";
+                                del.onclick = 'post("/post", "{"type":"delete", "target_id":"' + cont['id'] +
+                                    '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                                del.innerText = "Удалить публикацию";
+                                likes_block.append(del)
+                            }
+                        meme.append(likes_block);
+                    }
+                    else {
+                        var not_auth = document.createElement('div');
+                        not_auth.className = "likes_block auth_note";
+                            var pls_auth = document.createElement('a');
+                            pls_auth.className = "auth_note_button";
+                            pls_auth.href = "/login";
+                            pls_auth.innerText = "Авторизуйтесь";
+                        not_auth.append(pls_auth);
+                        not_auth.innerText = ", чтобы получить возможность лайкать и репостить публикации";
+
+                        meme.append(not_auth);
+                    }
+                }
+
+        }
+    </script>
 
 {% endblock %}
+
+<div class="meme_block" id="meme_block_{{ meme['id'] }}">
+
+            {% if meme['type'] == 'meme' %}
+                {% if data['info']['is_auth'] %}
+
+                {% else %}
+                    <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>,
+                        чтобы получить возможность лайкать и репостить публикации
+                    </div>
+                {% endif %}
+                <div class="category">
+                    {% for tag in meme['category'] %}
+                        <a href="/search/~{{ tag }}">#{{ tag }}{% if not loop.last %}, {% endif %}</a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% set meme_r = meme['reposted_content'] %}
+
+                <div class="meme_block margin_top" id="meme_block_{{ meme['id'] }}">
+                    {% if meme_r['place'] %}
+                        <div class="place">{{ meme_r['place'] }}</div>
+                    {% endif %}
+                    <div class="author">
+                        <div class="test">
+                            <a href="/author/{{ meme_r["author_id"] }}"><img
+                                    src={{ meme_r["author_img"] }} class="author_img"></a>
+                            <div class="author_name"><a
+                                    href="/author/{{ meme_r["author_id"] }}">{{ meme_r["author_name"] }}</a></div>
+                            <div class="meme_date">{{ meme_r["date"] }}</div>
+                        </div>
+                    </div>
+                    {% if meme_r["note"] %}
+                        <div class="note">{{ meme_r["note"] }}</div>
+                    {% endif %}
+                    <img src={{ meme_r["meme_img"] }} class="meme_img">
+                    {% if data['info']['is_auth'] %}
+                        <div class="likes_block">
+                            {% if meme_r["is_liked"] %}
+                                {% set liked = "like_btn_1" %}
+                            {% else %}
+                                {% set liked = "like_btn_0" %}
+                            {% endif %}
+                            {% if meme_r["is_reposted"] %}
+                                {% set reposted = "repost_btn_1" %}
+                            {% else %}
+                                {% set reposted = "repost_btn_0" %}
+                            {% endif %}
+                            <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn"
+                                 onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme_r["id"] }});'
+                                 id="l{{ meme_r["id"] }}_r">
+                            <div class="lr_number" id="ln{{ meme_r["id"] }}_r">{{ meme_r["likes"] }}</div>
+                            <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn"
+                                 onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme_r["id"] }});'
+                                 id="r{{ meme_r["id"] }}_r">
+                            <div class="lr_number" id="rn{{ meme_r["id"] }}_r">{{ meme_r["reposts"] }}</div>
+                            {% if meme_r["delete"] %}
+                                <div class="delete_btn"
+                                     onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>
+                                    Удалить публикацию
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>,
+                            чтобы получить возможность лайкать и репостить публикации
+                        </div>
+                    {% endif %}
+                    <div class="category">{{ meme_r['category'] }}</div>
+                </div>
+                <div class="likes_block">
+                    {% if meme["delete"] %}
+                        <div class="delete_btn"
+                             onclick='post("/post", "{\"type\":\"delete_repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>
+                            Удалить публикацию
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>

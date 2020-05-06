@@ -48,12 +48,6 @@ class TagAddingForm(FlaskForm):
     submit = SubmitField("Добавить")
 
 
-class MemeAddingForm(FlaskForm):
-    title = StringField("Заголовок", validators=[DataRequired()])
-    picture = FileField("Загрузите мем", validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
-    submit = SubmitField("Добавить")
-
-
 class EditProfileForm(FlaskForm):
     key = StringField()
     alias = StringField('Псевдоним')
