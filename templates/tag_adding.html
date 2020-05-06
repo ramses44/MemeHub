@@ -1,21 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1>Добавить тег</h1>
+    <div class="meme_block fixed_block">
+        <div class="auth_note_reg_log">Добавить тег</div>
         <form method="post" novalidate>
             {{ form.hidden_tag() }}
             <p>
-                {{ form.title.label }}<br>
-                {{ form.title(class="form-control") }}<br>
+                <div class="input_block">
+                <div class="label_note">
+                    {{ form.title.label }}
+                </div>
+                <div class="search_div_div">
+                    <div class="search_div_n">
+                        {{ form.title(class="search") }}
+                    </div>
+                </div>
+            </div>
                 {% for error in form.title.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
+                    <div class="input_block">
+                        <div class="error_note">
+                            {{ error }}
+                        </div>
                     </div>
                 {% endfor %}
             </p>
 
-            <p>{{ form.submit(type="submit", class="btn btn-outline-secondary") }}</p>
+            <p>{{ form.submit(type="submit", class="login_button") }}</p>
 
         </form>
     </div>
