@@ -10,9 +10,9 @@
             {% endif %}
             {% for user in data['subscribes'] %}
                 <div class="subs_block" id="subs_{{ user["id"] }}">
-                    <div class="subs_user_block" onClick="window.location='/author/{{ user["id"] }}"'">
-                        <img src="{{ user['avatar'] }}" class="subs_img">
-                        <div class="subs_username">{{ user['username'] }}</div>
+                    <div class="subs_user_block">
+                        <a href="/author/{{ user["id"] }}"><img src="{{ user['avatar'] }}" class="subs_img"></a>
+                        <a href="/author/{{ user["id"] }}"><div class="subs_username">{{ user['username'] }}</div></a>
                     </div>
                     <div class="subs_button" onclick="unsub_click('{{ user["id"] }}', 'subs_{{ user["id"] }}');">Отписаться</div>
                 </div>

@@ -30,6 +30,7 @@
     font-family: BoldFont;
     font-size: medium;
     color: rgb(50,50,50);
+    display: inline-block;
 }
 
 .subs_button {
