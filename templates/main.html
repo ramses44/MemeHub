@@ -210,7 +210,7 @@
                     <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme_r["id"] }});' id="r{{ meme_r["id"] }}_r">
                     <div class="lr_number" id="rn{{ meme_r["id"] }}_r">{{ meme_r["reposts"] }}</div>
                     {% if meme_r["delete"] %}
-                        <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
+                        <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
                     {% endif %}
                 </div>
             {% else %}
@@ -218,11 +218,11 @@
             {% endif %}
             <div class="category">{{ meme_r['category'] }}</div>
         </div>
-        <div class="likes_block">
-            {% if meme["delete"] %}
-                <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-            {% endif %}
-        </div>
+        {% if meme["delete"] %}
+            <div class="likes_block">
+                <div class="delete_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
 {% endfor %}

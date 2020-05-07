@@ -223,14 +223,38 @@ def post():
             else:
                 user.liked.append(target)
         elif req['type'] == 'repost':  # обработка репостов
-            pass
+            user = session.query(User).filter(User.id == req['user_id']).first()
+            target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            if target in [session.query(Meme).filter(Meme.id == r.meme).first() for r in user.repostes]:
+                # если репост уже был
+                print('remove')
+                repost = session.query(Repost).filter(Repost.meme == target.id).first()
+                user.repostes.remove(repost)
+                target.repostes.remove(repost)
+                session.query(Repost).filter(Repost.id == repost.id).delete()
+            else:
+                # если репоста не было
+                print('append')
+                repost = Repost(
+                    title='title',
+                    meme=req['target_id'],
+                    user=req['user_id']
+                )
+                session.add(repost)
+                user.repostes.append(repost)
+                target.repostes.append(repost)
         elif req['type'] == 'delete':  # обработка запросов на удаление мемов
             target = session.query(Meme).filter(Meme.id == req['target_id']).first()
             # удаление лайков
             for i in target.likes:
                 i.liked.remove(target)
             # удаление тегов
-
+            for tag in session.query(Tag).all():
+                if tag in list(target.tags):
+                    target.tags.remove(tag)
+            target.tags = []
+            # удаление репостов мема
+            session.query(Repost).filter(Repost.meme == target.id).delete()
             # удаление мема
             session.query(Meme).filter(Meme.id == req['target_id']).delete()
         elif req['type'] == 'sub' or req['type'] == 'unsub':  # обработка подписок
@@ -259,10 +283,6 @@ def user_page(username_id):
     if form2.validate_on_submit():
         if form.alias.data == '' and form.about.data == '' and form.avatar.data is None:
             # обработка публикаций мемов
-            print('meme-meme-meme')
-            print(form2.note.data)
-            print(form2.tags.data)
-            print(form2.img.data)
 
             session = db_session.create_session()
 
@@ -278,6 +298,9 @@ def user_page(username_id):
                 author=current_user.get_id(),
                 picture=fn
             )
+
+            for i in meme.tags:
+                print(i.title)
 
             # Сохраняем
             session.add(meme)
