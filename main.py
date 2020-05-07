@@ -91,14 +91,15 @@ def gen_data(do_get_content=True):
 
     if do_get_content:
         if current_user.is_authenticated:
-            res = get_content(uid=current_user.get_id(), by_server=True)
+            res = get_content(uid=current_user.get_id()).json
         else:
-            res = get_content(by_server=True)
+            res = get_content().json
     else:
         res = {}
 
     res['user_page'] = dict(is_page=False)
     res['info'] = info  # Совмещаем данные в один словарь
+    res['k'] = res.get('k', 1)
 
     return res  # Возвращаем его
 
@@ -151,6 +152,7 @@ def top_users():
 
     data = gen_data(do_get_content=False)
     data['content'] = [get_user_page_data(u.id) for u in users]
+    data['type'] = 'users'
 
     with open('data.json', 'w') as f:
         print(data, file=f)
@@ -164,7 +166,8 @@ def search(text):
 
     data = gen_data(do_get_content=False)
     data['content'] = do_search(text, int(current_user.get_id())).json['content']
-    data['type'] = 'search - ' + text
+    data['type'] = 'search'
+    data['search'] = text
 
     return render_template('main.html', data=data, title='Поиск: ' + text)
 
@@ -194,7 +197,7 @@ def index():
 
     data = gen_data()
     data['type'] = 'main'
-    with open('data.json', 'w') as f:
+    with open('data.json', 'w', encoding='utf-8') as f:
         print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
 
@@ -283,9 +286,10 @@ def user_page(username_id):
 
             session.commit()
     data = gen_data(do_get_content=False)
-    data['content'] = get_user_content(username_id).json['content']
+    data['content'] = get_user_content(username_id, int(current_user.get_id())).json['content']
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
+    data['type'] = 'page'
     return render_template('main.html', data=data, title=data['user_page']['username'], form=form, form2=form2)
 
 
@@ -411,4 +415,4 @@ def get_my_profile():
 
 
 if __name__ == '__main__':
-    app.run(port=1604, host='192.168.0.103')
+    app.run(port=8080, host='127.0.0.1')

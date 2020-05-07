@@ -13,7 +13,10 @@
         -->
         <title>{{ title }}</title>
     </head>
-    <body class="bg_style">
+    <body class="bg_style"
+            {% if data['type'] in ('main', 'page', 'search') %} onload="window.k = 0; primary_load()"
+            {% endif %}
+    >
         <div class="navigation">
             <div class="nav_block">
                 <div class="logo">MemeHub</div>
@@ -81,3 +84,5 @@
     }
     }
 </script>
+
+{% block scripts %}{% endblock %}
