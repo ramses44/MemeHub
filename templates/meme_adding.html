@@ -20,7 +20,7 @@
                 {{ form2.tags(autocomplete="off", id="tags_input", style="display: none;") }}
                 <div class="pub_tags">
                     {% for tag in data['user_page']['tags'] %}
-                        <div class="pub_tag" id="tag_{{ tag }}" onclick="click_tag('tag_{{ tag }}');">{{ tag }}</div>
+                        <div class="pub_tag" id="tag_{{ tag }}" onclick="click_tag('tag_{{ tag }}');">#{{ tag }}</div>
                     {% endfor %}
                 </div>
                 <div class="pub_btn_grp">
@@ -72,8 +72,8 @@
 
         function clean_tags()
         {
-            var tags_number = 0;
-            let tags_arr = [];
+            tags_number = 0;
+            tags_arr = [];
             // location.reload();
         }
      </script>
