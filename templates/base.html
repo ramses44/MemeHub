@@ -54,9 +54,6 @@
                     {% endif %}
                     <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
                     <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
-                    {% if data['info']['role'] == 'admin' %}
-                        <div class="menu_section" onClick="window.location='/addtag'">Добавить тег</div>
-                    {% endif %}
                 </div>
                 {% if data['info']['role'] == 'admin' %}
                     <div class="menu_block menu_block1">

@@ -273,7 +273,11 @@ def post():
             else:
                 u1.subscribed.append(u2)
         elif req['type'] == 'block' or req['type'] == 'unblock':  # обработка блокировок
-            pass
+            target = session.query(User).filter(User.id == req['target_id']).first()
+            if target.is_blocked:
+                target.is_blocked = False
+            else:
+                target.is_blocked = True
         elif req['type'] == 'delete_tag':  # обработка запросов на удаление тегов
             tag = req['target'][4:]
             session.query(Tag).filter(Tag.title == tag).delete()
@@ -359,6 +363,9 @@ def user_page(username_id):
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
     data['type'] = 'page'
+
+    if data['user_page']['role'] == 'user':
+        data['user_page']['role'] = ''
 
     session = db_session.create_session()
     data['user_page']['tags'] = [i.title for i in session.query(Tag).all()]

@@ -58,10 +58,11 @@ class EditProfileForm(FlaskForm):
 
 class MemePublishForm(FlaskForm):
     note = StringField()
+    tags = StringField()
     img = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!'), DataRequired()])
     submit = SubmitField("Опубликовать")
 
-    @staticmethod
-    def tags():
-        ses = create_session()
-        return map(lambda x: (x.id, x.title), ses.query(tags.Tag).all())
+    # @staticmethod
+    # def tags():
+    #     ses = create_session()
+    #     return map(lambda x: (x.id, x.title), ses.query(tags.Tag).all())
