@@ -34,9 +34,9 @@ class Repost(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False, default="")
     meme = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("memes.id"))
-    meme_ = orm.relation("Meme", foreign_keys=[meme])
+    meme_ = orm.relation("Meme", foreign_keys=[meme], lazy='subquery')
     user = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    user_ = orm.relation("User", foreign_keys=[user])
+    user_ = orm.relation("User", foreign_keys=[user], lazy='subquery')
     publication_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False, default=datetime.datetime.now)
 
     def __hash__(self):

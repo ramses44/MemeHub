@@ -119,14 +119,17 @@ def get_user_page_data(username_id):
     else:
         data['type'] = 'other'
     u1 = session.query(User).get(current_user.get_id())
-    if user in u1.subscribed:
+    if u1 and user in u1.subscribed:
         data['is_sub'] = True
     else:
         data['is_sub'] = False
     data['subs'] = len([i for i in session.query(User).all() if user in i.subscribed])
     data['posts'] = (len(list(session.query(Meme).filter(Meme.author == username_id))) +
                      len(list(session.query(Repost).filter(Repost.user == username_id))))
-    data['top'] = list(session.query(User).order_by(User.rating))[::-1].index(user) + 1
+    try:
+        data['top'] = list(session.query(User).order_by(User.rating))[::-1].index(user) + 1
+    except ValueError:
+        data['top'] = 0
     return data
 
 
@@ -141,7 +144,7 @@ def top_memes():
     """Топ мемов"""
 
     top = meme_selector.get_most_popular()
-    content = get_content(uid=current_user.get_id(), by_server=True, data=top)['content']
+    content = get_content(uid=current_user.get_id(), data=top).json['content']
 
     res = gen_data(do_get_content=False)
     res['load_more'] = False
@@ -156,15 +159,14 @@ def top_users():
     """Топ пользователей"""
 
     ses = db_session.create_session()
-    users = ses.query(User).filter(User.id != 0).all()
-    users = sorted(users, key=lambda x: x.rating, reverse=True)[:USER_TOP]
+    users = ses.query(User).filter(User.id != 0).order_by(User.rating).all()[::-1][:USER_TOP]
 
     data = gen_data(do_get_content=False)
     data['content'] = [get_user_page_data(u.id) for u in users]
     data['type'] = 'users'
 
-    with open('data.json', 'w') as f:
-        print(data, file=f)
+    # with open('data.json', 'w') as f:
+    #     print(data, file=f)
 
     return render_template('top_users.html', data=data, title='Топ пользователей')
 
@@ -206,8 +208,8 @@ def index():
 
     data = gen_data()
     data['type'] = 'main'
-    with open('data.json', 'w', encoding='utf-8') as f:
-        print(data, file=f)
+    # with open('data.json', 'w', encoding='utf-8') as f:
+    #     print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
 
 
@@ -359,7 +361,8 @@ def user_page(username_id):
 
             session.commit()
     data = gen_data(do_get_content=False)
-    data['content'] = get_user_content(username_id, int(current_user.get_id())).json['content']
+    id_ = int(current_user.get_id()) if current_user.is_authenticated else 0
+    data['content'] = get_user_content(username_id, id_).json['content']
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
     data['type'] = 'page'

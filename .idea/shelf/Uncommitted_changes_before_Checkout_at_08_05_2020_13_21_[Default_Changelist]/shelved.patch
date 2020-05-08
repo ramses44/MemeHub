@@ -1,0 +1,25 @@
+Index: .idea/MemeHub.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"PYTHON_MODULE\" version=\"4\">\r\n  <component name=\"Flask\">\r\n    <option name=\"enabled\" value=\"true\" />\r\n  </component>\r\n  <component name=\"NewModuleRootManager\">\r\n    <content url=\"file://$MODULE_DIR$\" />\r\n    <orderEntry type=\"jdk\" jdkName=\"Python 3.7\" jdkType=\"Python SDK\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n  <component name=\"TemplatesService\">\r\n    <option name=\"TEMPLATE_CONFIGURATION\" value=\"Jinja2\" />\r\n  </component>\r\n  <component name=\"TestRunnerService\">\r\n    <option name=\"PROJECT_TEST_RUNNER\" value=\"Unittests\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/MemeHub.iml	(revision b56020b5e0d2023608db8782359945abdd176c5b)
++++ .idea/MemeHub.iml	(date 1588933137587)
+@@ -5,13 +5,10 @@
+   </component>
+   <component name="NewModuleRootManager">
+     <content url="file://$MODULE_DIR$" />
+-    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
++    <orderEntry type="jdk" jdkName="Python 3.8" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+   <component name="TemplatesService">
+     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
+   </component>
+-  <component name="TestRunnerService">
+-    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+-  </component>
+ </module>
+\ No newline at end of file

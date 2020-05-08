@@ -36,6 +36,8 @@ def get_content(uid=0, k=0, data=()):
     # Если пользователь авторизован, получаем рекомендуемые мемы, иначе последние опубликованные
     tape, k = meme_selector.get_tape(uid, k) if not data else (data, 0)
     ses = db_session.create_session()
+    uid = int(uid)
+    popular = meme_selector.get_most_popular()
 
     content = []
     for pub in map(lambda x: ses.query(Meme).get(x.id) if type(x) == Meme else ses.query(Repost).get(x.id), tape):
@@ -54,7 +56,7 @@ def get_content(uid=0, k=0, data=()):
             'is_liked': uid in map(lambda x: x.id, meme.likes),
             'is_reposted': uid in map(lambda x: x.user, meme.repostes),  # заменил x.id на x.user
             'category': list(map(lambda x: x.title, meme.tags)),  # ", ".join(map(lambda x: x.title, meme.tags)),
-            'place': meme_selector.get_most_popular().index(meme) + 1,
+            'place': popular.index(meme) + 1 if meme in popular else 0,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
         }
 
@@ -72,6 +74,8 @@ def get_content(uid=0, k=0, data=()):
                 'reposted_content': cont
             })
 
+    with open('data.json', 'w', encoding='utf-8') as f:
+        print(content, file=f)
     return jsonify(dict(content=content, k=k))  # Возвращаем ответ
 
 
@@ -80,6 +84,7 @@ def do_search(data, uid=0, k=0):
 
     ses = db_session.create_session()
     content = []
+    popular = meme_selector.get_most_popular()
     for pub in meme_selector.search(data, k):
         meme = pub if type(pub) == Meme else pub.meme_
         cont = {
@@ -96,7 +101,7 @@ def do_search(data, uid=0, k=0):
             'is_liked': uid in map(lambda x: x.id, meme.likes),
             'is_reposted': uid in map(lambda x: x.id, meme.repostes),
             'category': list(map(lambda x: x.title, meme.tags)),
-            'place': meme_selector.get_most_popular().index(meme) + 1,
+            'place': popular.index(meme) + 1 if meme in popular else 0,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
         }
 
@@ -124,6 +129,7 @@ def get_user_content(uid, self_uid=0, k=0):
     content = []
     for pub in meme_selector.get_user_pubs(uid, k):
         meme = pub if type(pub) == Meme else pub.meme_
+        popular = meme_selector.get_most_popular()
         cont = {
             'type': 'meme',
             'id': str(meme.id),
@@ -138,7 +144,7 @@ def get_user_content(uid, self_uid=0, k=0):
             'is_liked': self_uid in map(lambda x: x.id, meme.likes),
             'is_reposted': self_uid in map(lambda x: x.id, meme.repostes),
             'category': list(map(lambda x: x.title, meme.tags)),
-            'place': meme_selector.get_most_popular().index(meme) + 1,
+            'place': popular.index(meme) + 1 if meme in popular else 0,
             'delete': self_uid == meme.author or ses.query(User).get(self_uid).role != ROLES.index('user')
         }
 
