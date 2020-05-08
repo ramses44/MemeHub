@@ -11,6 +11,17 @@
                 {% if data['user_page']['error_message'] %}
                     <div class="error_message">{{ data['user_page']['error_message'] }}</div>
                 {% endif %}
+                {% if data['user_page']['type'] == 'me' %}
+                        <style type="text/css">
+                            .img_sub_block {
+                                height: 200px;
+                            }
+
+                            .head_block {
+                                height: 200px;
+                            }
+                        </style>
+                {% endif %}
                 <div class="head_block">
                     <div class="img_sub_block">
                         <div class="img_block">
@@ -23,6 +34,7 @@
                                 <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
                             {% endif %}
                         </div>
+                        {% if data['user_page']['type'] != 'me' %}
                         <div class="sub_block">
                             {% if data['user_page']['type'] != 'me' %}
                                 {% if data['user_page']['is_sub'] %}
@@ -61,6 +73,7 @@
                                 </style>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                     <div class="username_block">
                         <div class="up_role">
@@ -511,7 +524,8 @@
                     del1.className = "delete_btn";
                     del1.onclick = function() {
                         post("/post", `{"type": "repost", "target_id":"${cont['reposted_content']['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
-                        deleteMeme(`meme_block_${cont['id']}`);
+                        // deleteMeme(`meme_block_${cont['id']}`);
+                        document.getElementById(cont['id']).remove();
                     }
                     del1.innerText = "Удалить публикацию";
                     del.append(del1);

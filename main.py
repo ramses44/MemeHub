@@ -235,10 +235,10 @@ def post():
         elif req['type'] == 'repost':  # обработка репостов
             user = session.query(User).filter(User.id == req['user_id']).first()
             target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            print('repost-test')
             if target in [session.query(Meme).filter(Meme.id == r.meme).first() for r in user.repostes]:
                 # если репост уже был
-                print('remove')
-                repost = session.query(Repost).filter(Repost.meme == target.id).first()
+                repost = session.query(Repost).filter(Repost.meme == target.id, Repost.user == user.id).first()
                 user.repostes.remove(repost)
                 target.repostes.remove(repost)
                 session.query(Repost).filter(Repost.id == repost.id).delete()
