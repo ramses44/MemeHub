@@ -426,12 +426,13 @@
                     else {
                         var not_auth = document.createElement('div');
                         not_auth.className = "likes_block auth_note";
-                            var pls_auth = document.createElement('a');
-                            pls_auth.className = "auth_note_button";
-                            pls_auth.href = "/login";
-                            pls_auth.innerText = "Авторизуйтесь";
+                        var pls_auth = document.createElement('a');
+                        pls_auth.className = "auth_note_button";
+                        pls_auth.href = "/login";
+                        pls_auth.innerText = "Авторизуйтесь";
                         not_auth.append(pls_auth);
                         not_auth.innerText = ", чтобы получить возможность лайкать и репостить публикации";
+
 
                         meme.append(not_auth);
                     }
