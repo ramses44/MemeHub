@@ -10,15 +10,14 @@
         <link rel="stylesheet" type="text/css" href="../../static/css/publish_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/subscribes_css.css">
         <!--
-        <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-          -->
+        -->
         <title>{{ title }}</title>
     </head>
-    <body class="bg_style">
+    <body class="bg_style"
+            {% if data['type'] in ('main', 'page', 'search') %} onload="window.k = 0; primary_load()"
+            {% endif %}
+    >
         <div class="navigation">
             <div class="nav_block">
                 <div class="logo">MemeHub</div>
@@ -55,6 +54,9 @@
                     {% endif %}
                     <div class="menu_section" onClick="window.location='/top_memes'">Топ мемов</div>
                     <div class="menu_section" onClick="window.location='/top_users'">Топ пользователей</div>
+                    {% if data['info']['role'] == 'admin' %}
+                        <div class="menu_section" onClick="window.location='/addtag'">Добавить тег</div>
+                    {% endif %}
                 </div>
                 {% if data['info']['role'] == 'admin' %}
                     <div class="menu_block menu_block1">
@@ -82,3 +84,5 @@
     }
     }
 </script>
+
+{% block scripts %}{% endblock %}

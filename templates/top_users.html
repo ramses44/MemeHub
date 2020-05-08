@@ -10,7 +10,7 @@
                 </div>
                 <div class="sub_block">
                     {% if user['type'] != 'me' %}
-                        {% if data['user_page']['is_sub'] %}
+                        {% if user['is_sub'] %}
                             <div class="sub_button sub_button_true" id="sub-button{{ user['user_id'] }}" onclick="sub_click({{ user['user_id'] }})">Вы подписаны</div>
                         {% else %}
                             <div class="sub_button sub_button_false" id="sub-button{{ user['user_id'] }}" onclick="sub_click({{ user['user_id'] }})">Подписаться</div>
@@ -29,22 +29,17 @@
                                 height: 236px;
                             }
                         </style>
-                        <style type="text/css">
-                            .head_block {
-                                height: 200px;
-                            }
-                        </style>
                     {% endif %}
                 </div>
             </div>
             <div class="username_block">
                 <div class="up_role">
-                    {% if user['role'] %}
+                    {% if user['role'] != 'user' %}
                         <div class="admin_role">{{ user['role'] }}</div>
                     {% endif %}
                 </div>
                     <div class="up_text_block_other up_username_div_other">
-                        <div class="up_text_block_input_other up_username_other">{{ user['username'] }}</div>
+                        <div class="up_text_block_input_other up_username_other" ><a href="/author/{{ user['user_id'] }}">{{ user['username'] }}</a></div>
                     </div>
                     <div class="up_text_block_other up_status_div_other">
                         <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ user['status'] }}</div>

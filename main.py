@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
 from data import db_session
 from auxiliary import avatar_convert, meme_selector, user_selector
+from auxiliary.user_selector import USER_TOP
 from werkzeug.utils import secure_filename
 from flask_restful import abort
 from data.tags import Tag
@@ -16,7 +17,6 @@ import time
 from threading import Thread
 
 ROLES = ['user', 'moder', 'admin']
-USER_TOP = 5
 REFRESH_PERIOD = 12
 USER_PAGE = {'is_page': True, 'user_img': '../../static/img/img1.jpg', 'type': 'me', 'role': 'moder',
              'status': 'users_status',
@@ -91,15 +91,15 @@ def gen_data(do_get_content=True):
 
     if do_get_content:
         if current_user.is_authenticated:
-            res = get_content(uid=current_user.get_id(), by_server=True)
+            res = get_content(uid=current_user.get_id()).json
         else:
-            res = get_content(by_server=True)
+            res = get_content().json
     else:
         res = {}
 
     res['user_page'] = dict(is_page=False)
-    res['load_more'] = True
     res['info'] = info  # Совмещаем данные в один словарь
+    res['k'] = res.get('k', 1)
 
     return res  # Возвращаем его
 
@@ -108,11 +108,11 @@ def get_user_page_data(username_id):
     """Функция для получения данных о пользователе"""
     session = db_session.create_session()
     user = session.query(User).filter(User.id == username_id).first()
-    data = user.get_data()
+    data = user_selector.gen_user_info(username_id, self_uid=current_user.get_id())
     data['user_img'] = '../../static/img/avatars/' + data['user_img']
     # определяется, как будет отображаться страница: как личная или как страница другого пользователя
     if current_user.is_authenticated:
-        if str(current_user.id) == str(username_id):
+        if str(current_user.get_id()) == str(username_id):
             data['type'] = 'me'
         else:
             data['type'] = 'other'
@@ -146,6 +146,7 @@ def top_memes():
     res = gen_data(do_get_content=False)
     res['load_more'] = False
     res['content'] = content
+    res['type'] = 'top'
 
     return render_template('main.html', data=res, title='Топ мемов')
 
@@ -160,6 +161,10 @@ def top_users():
 
     data = gen_data(do_get_content=False)
     data['content'] = [get_user_page_data(u.id) for u in users]
+    data['type'] = 'users'
+
+    with open('data.json', 'w') as f:
+        print(data, file=f)
 
     return render_template('top_users.html', data=data, title='Топ пользователей')
 
@@ -170,6 +175,8 @@ def search(text):
 
     data = gen_data(do_get_content=False)
     data['content'] = do_search(text, int(current_user.get_id())).json['content']
+    data['type'] = 'search'
+    data['search'] = text
 
     return render_template('main.html', data=data, title='Поиск: ' + text)
 
@@ -198,7 +205,8 @@ def index():
     """Главная страница"""
 
     data = gen_data()
-    with open('data.json', 'w') as f:
+    data['type'] = 'main'
+    with open('data.json', 'w', encoding='utf-8') as f:
         print(data, file=f)
     return render_template('main.html', data=data, title='Главная')
 
@@ -284,7 +292,10 @@ def user_page(username_id):
         if form.alias.data == '' and form.about.data == '' and form.avatar.data is None:
             # обработка публикаций мемов
 
-            session = db_session.create_session()
+            if not current_user.is_authenticated:
+                # Если пользователь не вошёл в систему, кидаем ошибку
+                abort(401,
+                      message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
 
             # Сохраняем картинку
             filename = secure_filename(form2.img.data.filename)
@@ -292,6 +303,7 @@ def user_page(username_id):
             form2.img.data.save('static/img/memes/' + fn)
 
             # Создаём мем
+            session = db_session.create_session()
             meme = Meme(
                 title=form2.note.data,
                 tags=[session.query(Tag).filter(Tag.title == i).first() for i in form2.tags.data.split()],
@@ -317,7 +329,7 @@ def user_page(username_id):
             user = session.query(User).filter(User.id == current_user.get_id()).first()
 
             if form.alias.data != user.alias:  # обработка изменений имени пользователя
-                if form.alias.data == '':
+                if not form.alias.data:
                     error_message = 'Такое имя пользователя недопустимо'
                 else:
                     if form.alias.data in [i.alias for i in session.query(User).all()]:
@@ -342,9 +354,11 @@ def user_page(username_id):
                 user.avatar = fn
 
             session.commit()
-    data = gen_data()
+    data = gen_data(do_get_content=False)
+    data['content'] = get_user_content(username_id, int(current_user.get_id())).json['content']
     data['user_page'] = get_user_page_data(username_id)
     data['user_page']['error_message'] = error_message
+    data['type'] = 'page'
 
     session = db_session.create_session()
     data['user_page']['tags'] = [i.title for i in session.query(Tag).all()]
@@ -460,7 +474,6 @@ def addtag():
 
     else:
         # GET-запрос
-
         return render_template('tag_adding.html', title='Добавить тег', form=form, current_user=current_user, data=data)
 
 
@@ -471,50 +484,6 @@ def subscribed():
     data = gen_data()
     data['subscribes'] = [i.get_info() for i in load_user(current_user.id).subscribed]
     return render_template('subscribed.html', title='Добавить тег', current_user=current_user, data=data)
-
-
-@app.route('/addmeme', methods=['POST', 'GET'])
-def addmeme():
-    """Механизм добавления мема"""
-
-    form = MemeAddingForm()
-
-    if not current_user.is_authenticated:
-        # Если пользователь не вошёл в систему, кидаем ошибку
-        abort(401, message="Только авторизованные пользователи могут добавлять мемы! Пожалуйста, авторизуйтесь.")
-
-    ses = db_session.create_session()
-    tags = [(t.id, t.title) for t in ses.query(Tag).all()]
-
-    if form.validate_on_submit():
-        # Если POST-запрос
-
-        if len(request.form.getlist('tags')) > 5:
-            # Проверяем, сколько тегов добавил пользователь
-            flash("Слишком много тегов! Их должно быть не больше 5")
-            return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
-
-        # Сохраняем картинку
-        filename = secure_filename(form.picture.data.filename)
-        fn = str(datetime.now()).replace(":", "_").replace(" ", "_") + filename[-4:]
-        form.picture.data.save('static/img/avatars' + fn)
-
-        # Создаём мем
-        meme = Meme(
-            title=form.title.data,
-            tags=[ses.query(Tag).get(t) for t in request.form.getlist('tags')],
-            author=current_user.get_id(),
-            picture=fn
-        )
-
-        # Сохраняем
-        ses.add(meme)
-        ses.commit()
-
-        return redirect('/me')  # Возвращаем пользователя на свою страницу
-
-    # GET-запрос
-    return render_template('meme_adding.html', title='Добавить мем', form=form, data=DATA, tags=tags)
 
 
 @app.route('/me')

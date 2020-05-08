@@ -9,12 +9,13 @@ LAST_PUBS_COUNT = 50
 FROM_SUBSCRIBES_COEFFICIENT = 0.5
 LAST_FROM_SUB_COUNT = int(LAST_PUBS_COUNT * FROM_SUBSCRIBES_COEFFICIENT)
 LAST_MEMES_COUNT = LAST_PUBS_COUNT - LAST_FROM_SUB_COUNT
-TAPE_SIZE = 20
+TAPE_SIZE = 10
+SORT_KEY = lambda x: x.publication_date
 
 
 def get_from_memes(lst, bs=(0, 0)):  # bs - barriers
     """Функция для получения количественного диапазона мемов по дате публикации с конца"""
-    sted = sorted(lst, key=lambda x: x.publication_date)
+    sted = sorted(lst, key=SORT_KEY)
     return sted[-bs[0]:-bs[1]] if bs[1] else sted[-bs[0]:]
 
 
@@ -23,7 +24,7 @@ def get_pubs(*us, bs=(0, 0)) -> list:  # bs - barriers
      отсортированных по дате публикации (определённое кол-во)"""
     res = []
     for u in us:
-        res += sorted(list(u.repostes) + list(u.memes), key=lambda x: x.publication_date, reverse=True)
+        res += sorted(list(u.repostes) + list(u.memes), key=SORT_KEY, reverse=True)
     if bs:
         res = res[-bs[0]:-bs[1]] if bs[1] else res[-bs[0]:]
     return res
@@ -93,11 +94,12 @@ def get_most_popular():
     return sorted(ses.query(Meme), key=lambda x: len(list(x.likes)), reverse=True)[:TOP_LEN]
 
 
-def get_user_memes(user_id):
-    """Функция для получения списка мемов пользователя"""
-    session = create_session()
-    memes = session.query(Meme).filter(Meme.author.like(user_id)).all()
-    return memes
+def get_user_pubs(uid, k=0):
+    """Функция для получения списка публикаций пользователя"""
+    ses = create_session()
+    memes = ses.query(Meme).filter(Meme.author == uid).all()
+    repostes = ses.query(Repost).filter(Repost.user == uid).all()
+    return sorted(memes + repostes, key=SORT_KEY, reverse=True)[LAST_PUBS_COUNT * k: LAST_PUBS_COUNT * (k + 1)]
 
 
 def search(text, k=0):
@@ -111,7 +113,7 @@ def search(text, k=0):
 
         memes = ses.query(Meme).all()
         memes = list(filter(lambda x: tags & set(x.tags), memes))
-        memes.sort(key=lambda x: x.publication_date, reverse=True)
+        memes.sort(key=SORT_KEY, reverse=True)
 
         return memes[k * LAST_PUBS_COUNT:(k + 1) * LAST_PUBS_COUNT]
 
@@ -119,9 +121,10 @@ def search(text, k=0):
 
         pubs = ses.query(Meme).filter(Meme.title.like(f'%{text}%')).all() + \
             ses.query(Repost).filter(Repost.title.like(f'%{text}%')).all()
-        pubs.sort(key=lambda x: x.publication_date, reverse=True)
+        pubs.sort(key=SORT_KEY, reverse=True)
 
         return pubs[k * LAST_PUBS_COUNT:(k + 1) * LAST_PUBS_COUNT]
+
 
 
 if __name__ == '__main__':

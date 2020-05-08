@@ -1,283 +1,195 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-{% if data['user_page']['is_page'] %}
+    <div id="main" >
+    {% if data['user_page']['is_page'] %}
 
-<div class="meme_block">
-    <form method="post" novalidate enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        {% if data['user_page']['error_message'] %}
-            <div class="error_message">{{ data['user_page']['error_message'] }}</div>
-        {% endif %}
-        <div class="head_block">
-            <div class="img_sub_block">
-                <div class="img_block">
-                    {% if data['user_page']['type'] == 'me' %}
-                        <div class="up_img_text" onclick="document.getElementById('img-input').click()">Обновить фотографию</div>
-                        <img src="{{ data['user_page']['user_img'] }}" class="up_img">
-                    {% else %}
-                        <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
-                    {% endif %}
-                </div>
-                <div class="sub_block">
-                    {% if data['user_page']['type'] != 'me' %}
-                        {% if data['user_page']['is_sub'] %}
-                            <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы подписаны</div>
-                        {% else %}
-                            <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">Подписаться</div>
-                        {% endif %}
-                    {% endif %}
-                    {% if data['info']['admin'] %}
-                        {% if data['user_page']['is_block'] %}
-                            <div class="sub_button block_button_true" id="block-button" onclick="block_click()">Разблокировать</div>
-                        {% else %}
-                            <div class="sub_button block_button_false" id="block-button" onclick="block_click()">Заблокировать</div>
-                        {% endif %}
-                    {% endif %}
-                    {% if data['user_page']['type'] == 'me' or not data['info']['admin'] %}
-                        <style type="text/css">
-                            .head_block {
-                                height: 236px;
-                            }
-                        </style>
-                    {% endif %}
-                    {% if data['user_page']['type'] == 'me' and not data['info']['admin'] %}
-                        <style type="text/css">
-                            .head_block {
-                                height: 200px;
-                            }
-                        </style>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="username_block">
-                <div class="up_role">
-                    {% if data['user_page']['role'] %}
-                        <div class="admin_role">{{ data['user_page']['role'] }}</div>
-                    {% endif %}
-                </div>
-                {% if data['user_page']['type'] == 'me' %}
-                    <div class="up_text_block up_username_div">
-                        {{ form.alias(value=data['user_page']['username'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_username", autocomplete="off", maxlength=25) }}
-                    </div>
-                    <div class="up_text_block up_status_div">
-                        {{ form.about(rows=5, value=data['user_page']['status'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_status up_text_block_input2", autocomplete="off", maxlength=40) }}
-                    </div>
-                {% else %}
-                    <div class="up_text_block_other up_username_div_other">
-                        <div class="up_text_block_input_other up_username_other">{{ data['user_page']['username'] }}</div>
-                    </div>
-                    <div class="up_text_block_other up_status_div_other">
-                        <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ data['user_page']['status'] }}</div>
-                    </div>
+        <div class="meme_block">
+            <form method="post" novalidate enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {% if data['user_page']['error_message'] %}
+                    <div class="error_message">{{ data['user_page']['error_message'] }}</div>
                 {% endif %}
-                <div class="info_block">
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Подписчики</div>
-                        <div class="up_data_block_part2" id="subs-number">{{ data['user_page']['subs'] }}</div>
+                <div class="head_block">
+                    <div class="img_sub_block">
+                        <div class="img_block">
+                            {% if data['user_page']['type'] == 'me' %}
+                                <div class="up_img_text" onclick="document.getElementById('img-input').click()">Обновить
+                                    фотографию
+                                </div>
+                                <img src="{{ data['user_page']['user_img'] }}" class="up_img">
+                            {% else %}
+                                <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
+                            {% endif %}
+                        </div>
+                        <div class="sub_block">
+                            {% if data['user_page']['type'] != 'me' %}
+                                {% if data['user_page']['is_sub'] %}
+                                    <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы
+                                        подписаны
+                                    </div>
+                                {% else %}
+                                    <div class="sub_button sub_button_false" id="sub-button" onclick="sub_click()">
+                                        Подписаться
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            {% if data['info']['role'] == 'admin' and data['user_page']['role'] != 'admin' %}
+                                {% if data['user_page']['is_block'] %}
+                                    <div class="sub_button block_button_true" id="block-button" onclick="block_click()">
+                                        Разблокировать
+                                    </div>
+                                {% else %}
+                                    <div class="sub_button block_button_false" id="block-button"
+                                         onclick="block_click()">Заблокировать
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            {% if data['user_page']['type'] == 'me' or data['info']['role'] != 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 236px;
+                                    }
+                                </style>
+                            {% endif %}
+                            {% if data['user_page']['type'] == 'me' and data['info']['role'] != 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 200px;
+                                    }
+                                </style>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Публикации</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['posts'] }}</div>
-                    </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Рейтинг</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
-                    </div>
-                    <div class="up_data_block">
-                        <div class="up_data_block_part1">Место в топе</div>
-                        <div class="up_data_block_part2">{{ data['user_page']['top'] }}</div>
+                    <div class="username_block">
+                        <div class="up_role">
+                            {% if data['user_page']['role'] %}
+                                <div class="admin_role">{{ data['user_page']['role'] }}</div>
+                            {% endif %}
+                        </div>
+                        {% if data['user_page']['type'] == 'me' %}
+                            <div class="up_text_block up_username_div">
+                                {{ form.alias(value=data['user_page']['username'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_username", autocomplete="off", maxlength=25) }}
+                            </div>
+                            <div class="up_text_block up_status_div">
+                                {{ form.about(rows=5, value=data['user_page']['status'], onchange="document.getElementById('form-submit').click()", class="up_text_block_input up_status up_text_block_input2", autocomplete="off", maxlength=40) }}
+                            </div>
+                        {% else %}
+                            <div class="up_text_block_other up_username_div_other">
+                                <div class="up_text_block_input_other up_username_other">{{ data['user_page']['username'] }}</div>
+                            </div>
+                            <div class="up_text_block_other up_status_div_other">
+                                <div class="up_text_block_input_other up_status_other up_text_block_input2_other">{{ data['user_page']['status'] }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="info_block">
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Подписчики</div>
+                                <div class="up_data_block_part2" id="subs-number">{{ data['user_page']['subs'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Публикации</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['posts'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Рейтинг</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['rating'] }}</div>
+                            </div>
+                            <div class="up_data_block">
+                                <div class="up_data_block_part1">Место в топе</div>
+                                <div class="up_data_block_part2">{{ data['user_page']['top'] }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div>
-            {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click();", style="display: none;") }}
-        </div>
+                <div>
+                    {{ form.avatar(class="input-group mb-3", id="img-input", onchange="document.getElementById('form-submit').click();", style="display: none;") }}
+                </div>
 
-        <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
-    </form>
-</div>
-
-{% if data['user_page']['type'] == "me" %}
-    <div class="meme_block">
-        <div class="publish_block">
-            <form method="post" novalidate enctype="multipart/form-data" onkeydown="return event.key != 'Enter';" name="my">
-                {{ form2.hidden_tag() }}
-                <div class="pub_head">Новая публикация</div>
-                <div class="pub_notes">Комментарий</div>
-                <div class="pub_input_div">
-                    {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
-                </div>
-                <div class="pub_notes">Теги</div>
-                {{ form2.tags(autocomplete="off", id="tags_input", style="display: none;") }}
-                <div class="pub_tags">
-                    {% for tag in data['user_page']['tags'] %}
-                        <div class="pub_tag" id="tag_{{ tag }}" onclick="click_tag('tag_{{ tag }}');">{{ tag }}</div>
-                    {% endfor %}
-                </div>
-                <div class="pub_btn_grp">
-                    <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
-                    <div id="div_meme" class="pub_choose_txt"></div>
-                </div>
-                <img id="img_meme" src="" class="pub_img_preview" alt="Ошибка файла" />
-                <div class="pub_btn_grp">
-                    <div class="pub_choose_btn" onclick="document.getElementById('publish-submit').click(); clean_tags();">Опубликовать</div>
-                </div>
-                {{ form2.img(class="input-group mb-3", id="input_meme", onchange="preview_image(event)", style="display: none;") }}
-                {{ form2.submit(type="submit", style="display: none;", id="publish-submit") }}
+                <div>{{ form.submit(type="submit", id="form-submit", style="display: none;") }}</div>
             </form>
         </div>
-    </div>
-{% endif %}
 
-{% endif %}
+        {% if data['user_page']['type'] == "me" and not data['user_page']['is_block'] %}
+            {% include "meme_adding.html" %}
+        {% endif %}
 
-{% for meme in data['content'] %}
-<div class="meme_block" id="meme_block_{{ meme['id'] }}">
-    {% if meme['place'] %}
-        <div class="place">{{ meme['place'] }}</div>
     {% endif %}
-    <div class="author">
-        <div class="test">
-            <a href="/author/{{ meme["author_id"] }}"><img src={{ meme["author_img"] }} class="author_img"></a>
-            <div class="author_name"><a href="/author/{{ meme["author_id"] }}">{{ meme["author_name"] }}</a></div>
-            <div class="meme_date">{{ meme["date"] }}</div>
-        </div>
+
+    <div class="meme_block load_button" id="load_more" onclick="load_more()">Загузить ещё</div>
     </div>
-    {% if meme['type'] == 'meme' %}
-        {% if meme["note"] %}
-            <div class="note">{{ meme["note"] }}</div>
-        {% endif %}
-        <img src={{ meme["meme_img"] }} class="meme_img">
-        {% if data['info']['is_auth'] %}
-            <div class="likes_block">
-                {% if meme["is_liked"] %}
-                    {% set liked = "like_btn_1" %}
-                {% else %}
-                    {% set liked = "like_btn_0" %}
-                {% endif %}
-                {% if meme["is_reposted"] %}
-                    {% set reposted = "repost_btn_1" %}
-                {% else %}
-                    {% set reposted = "repost_btn_0" %}
-                {% endif %}
-                <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn" onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme["id"] }});' id="l{{ meme["id"] }}">
-                <div class="lr_number" id="ln{{ meme["id"] }}">{{ meme["likes"] }}</div>
-                <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme["id"] }});' id="r{{ meme["id"] }}">
-                <div class="lr_number" id="rn{{ meme["id"] }}">{{ meme["reposts"] }}</div>
-                {% if meme["delete"] %}
-                    <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-                {% endif %}
-            </div>
-        {% else %}
-            <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>, чтобы получить возможность лайкать и репостить публикации</div>
-        {% endif %}
-        <div class="category">{{ meme['category'] }}</div>
-    {% else %}
-        {% set meme_r = meme['reposted_content'] %}
 
-        <div class="meme_block margin_top" id="meme_block_{{ meme['id'] }}">
-            {% if meme_r['place'] %}
-                <div class="place">{{ meme_r['place'] }}</div>
-            {% endif %}
-            <div class="author">
-                <div class="test">
-                    <a href="/author/{{ meme_r["author_id"] }}"><img src={{ meme_r["author_img"] }} class="author_img"></a>
-                    <div class="author_name"><a href="/author/{{ meme_r["author_id"] }}">{{ meme_r["author_name"] }}</a></div>
-                    <div class="meme_date">{{ meme_r["date"] }}</div>
-                </div>
-            </div>
-            {% if meme_r["note"] %}
-                <div class="note">{{ meme_r["note"] }}</div>
-            {% endif %}
-            <img src={{ meme_r["meme_img"] }} class="meme_img">
-            {% if data['info']['is_auth'] %}
-                <div class="likes_block">
-                    {% if meme_r["is_liked"] %}
-                        {% set liked = "like_btn_1" %}
-                    {% else %}
-                        {% set liked = "like_btn_0" %}
-                    {% endif %}
-                    {% if meme_r["is_reposted"] %}
-                        {% set reposted = "repost_btn_1" %}
-                    {% else %}
-                        {% set reposted = "repost_btn_0" %}
-                    {% endif %}
-                    <img src="http://127.0.0.1:8080/static/img/interface/{{ liked }}.png" class="like_btn" onclick='post("/post", "{\"type\":\"like\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage1({{ meme_r["id"] }});' id="l{{ meme_r["id"] }}_r">
-                    <div class="lr_number" id="ln{{ meme_r["id"] }}_r">{{ meme_r["likes"] }}</div>
-                    <img src="http://127.0.0.1:8080/static/img/interface/{{ reposted }}.png" class="repost_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); changeImage2({{ meme_r["id"] }});' id="r{{ meme_r["id"] }}_r">
-                    <div class="lr_number" id="rn{{ meme_r["id"] }}_r">{{ meme_r["reposts"] }}</div>
-                    {% if meme_r["delete"] %}
-                        <div class="delete_btn" onclick='post("/post", "{\"type\":\"delete\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["user_id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-                    {% endif %}
-                </div>
-            {% else %}
-                <div class="likes_block auth_note"><a class="auth_note_button" href="/login">Авторизируйтесь</a>, чтобы получить возможность лайкать и репостить публикации</div>
-            {% endif %}
-            <div class="category">{{ meme_r['category'] }}</div>
-        </div>
-        {% if meme["delete"] %}
-            <div class="likes_block">
-                <div class="delete_btn" onclick='post("/post", "{\"type\":\"repost\", \"target_id\":\"{{ meme_r["id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\"}"); deleteMeme("meme_block_{{ meme['id'] }}")'>Удалить публикацию</div>
-            </div>
-        {% endif %}
-    {% endif %}
-</div>
-{% endfor %}
+{% endblock %}
 
-{% if data['load_more'] %}
-    <div class="meme_block load_button">Загузить ещё</div>
-{% endif %}
+{% block scripts %}
 
-
-<script>
-    function post(url, data, callback) {
-        try {
-             var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
-             req.open('POST', url, 1);
-             req.setRequestHeader('Content-type', 'application/json');
-             req.send(data)
-         } catch (e) {
-             window.console && console.log(e);
-         }
+    <script>
+        var verified = [];
+        var max_tags_count = 2;
+        document.querySelector('select').onchange = function (e) {
+            if (this.querySelectorAll('option:checked').length <= max_tags_count) {
+                verified = Array.apply(null, this.querySelectorAll('option:checked'));
+            } else {
+                Array.apply(null, this.querySelectorAll('option')).forEach(function (e) {
+                    e.selected = verified.indexOf(e) > -1;
+                });
+            }
         }
-
-    function reload() {
-        window.location.reload()
-    }
     </script>
 
-<script>
+    <script>
+        function post(url, data, callback) {
+            try {
+                var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                req.open('POST', url, 1);
+                req.setRequestHeader('Content-type', 'application/json');
+                req.send(data)
+            } catch (e) {
+                window.console && console.log(e);
+            }
+        }
+
+        function reload() {
+            window.location.reload()
+        }
+    </script>
+
+    <script>
         function changeImage1(meme_id) {
 
-            if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png")
-            {
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
+                return;
+            }
+
+            if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
                 document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
                 document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
                 document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
                 document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
-            }
-            else
-            {
+            } else {
                 document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
                 document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
                 document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
                 document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
             }
         }
+
         function changeImage2(meme_id) {
 
-            if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png")
-            {
+            if ({{ data['user_page']['is_block'] }}) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
+                return;
+            }
+
+            if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
                 document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
                 document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
                 document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
                 document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
-            }
-            else
-            {
+            } else {
                 document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
                 document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
                 document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
@@ -286,19 +198,30 @@
         }
 
         function deleteMeme(meme_id) {
-            document.getElementById(meme_id).remove();
+
+            if ({{ data['user_page']|tojson|safe }}['is_block']) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете удалять никакие публикации');
+            }
+            else {
+                document.getElementById(meme_id).remove();
+                post("/post", "{\"target_id\":\"" + meme_id + "\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"delete\"}");
+            }
         }
 
-        function sub_click(){
+        function sub_click() {
+
+            if ({{ data|tojson|safe }}['user_page']['is_block']) {
+                alert('Ваш аккаунт заблокирован администрацией! Вы не можете взаимодействовать с другими пользователями');
+                return;
+            }
+
             if (document.getElementById("sub-button").innerHTML == "Вы подписаны") {
                 document.getElementById("sub-button").innerHTML = "Подписаться";
                 document.getElementById("sub-button").classList.remove("sub_button_true");
                 document.getElementById("sub-button").classList.add("sub_button_false");
                 document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) - 1;
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
-            }
-            else
-            {
+            } else {
                 document.getElementById("sub-button").innerHTML = "Вы подписаны";
                 document.getElementById("sub-button").classList.remove("sub_button_false");
                 document.getElementById("sub-button").classList.add("sub_button_true");
@@ -307,15 +230,13 @@
             }
         }
 
-        function block_click(){
+        function block_click() {
             if (document.getElementById("block-button").innerHTML == "Разблокировать") {
                 document.getElementById("block-button").innerHTML = "Заблокировать";
                 document.getElementById("block-button").classList.remove("block_button_true");
                 document.getElementById("block-button").classList.add("block_button_false");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unblock\"}");
-            }
-            else
-            {
+            } else {
                 document.getElementById("block-button").innerHTML = "Разблокировать";
                 document.getElementById("block-button").classList.remove("block_button_false");
                 document.getElementById("block-button").classList.add("block_button_true");
@@ -323,65 +244,283 @@
             }
         }
 
-        var input = document.getElementById( 'input_meme' );
-        var infoArea = document.getElementById( 'div_meme' );
-        input.addEventListener( 'change', showFileName );
+        var input = document.getElementById('input_meme');
+        var infoArea = document.getElementById('div_meme');
+        input.addEventListener('change', showFileName);
 
-        function showFileName( event ) {
+        function showFileName(event) {
             var input = event.srcElement;
             var fileName = input.files[0].name;
             infoArea.textContent = fileName;
         }
 
-        function preview_image(event)
-        {
+        function preview_image(event) {
             var reader = new FileReader();
-            reader.onload = function()
-            {
+            reader.onload = function () {
                 var output = document.getElementById('img_meme');
                 output.src = reader.result;
             }
             reader.readAsDataURL(event.target.files[0]);
         }
 
-        var tags_number = 0;
-        let tags_arr = [];
-        function click_tag(tag_id)
-        {
-            if (document.getElementById(tag_id).classList.contains('pub_pressed'))
-            {
-                document.getElementById(tag_id).classList.remove('pub_pressed');
-                tags_number--;
-                var index = tags_arr.indexOf(document.getElementById(tag_id).innerHTML);
-                if (index !== -1)
-                {
-                    tags_arr.splice(index, 1);
+    </script>
+
+    <script>
+        function load_more() {
+            var req = new XMLHttpRequest();
+            try {
+            {% if data['type'] == 'main' %}
+                req.open("GET", "/get_content/{% if data['info'] %}{{data['info']['id']}}{% else %}0{% endif %}/" + window.k.toString());
+                req.send();
+                req.onreadystatechange = function() {
+                    if (req.readyState === 4 && req.status === 200) {
+                        window.k = Number(JSON.parse(req.responseText)['k']);
+                        var cont = JSON.parse(req.responseText)['content'];
+                        if (cont.toString() === "") document.getElementById("load_more").remove();
+                        else for (var i = 0; i < cont.length; i++) { add_cont(cont[i]); }
+                    }
                 }
-                create_tags();
-            }
-            else
-            {
-                if (tags_number < 5)
-                {
-                    document.getElementById(tag_id).classList.add('pub_pressed');
-                    tags_number++;
-                    tags_arr[tags_arr.length] = document.getElementById(tag_id).innerHTML;
-                    create_tags();
+            {% elif data['type'] == 'search' %}
+                req.open("GET", "/do_search/{{ data['search'] }}/{% if data['info']['is_auth'] %}{{ data['info']['id'] }}{% else %}0{% endif %}/" + window.k.toString());
+                req.send();
+                req.onreadystatechange = function() {
+                    if (req.readyState === 4 && req.status === 200) {
+                        window.k++;
+                        var cont = JSON.parse(req.responseText)['content'];
+                        if (cont.toString() === "") document.getElementById("load_more").remove();
+                        else {
+                            for (var i = 0; i < cont.length; i++) {
+                                add_cont(cont[i]);
+                            }
+                        }
+                    }
                 }
+            {% elif data['type'] == 'page' %}
+                req.open("GET", "/user_content/{{ data['user_page']['user_id'] }}/{% if data['info']['is_auth'] %}{{ data['info']['id'] }}{% else %}0{% endif %}/" + window.k.toString());
+                req.send();
+                req.onreadystatechange = function() {
+                    if (req.readyState === 4 && req.status === 200) {
+                        window.k++;
+                        var cont = JSON.parse(req.responseText)['content'];
+                        if (cont.toString() === "") document.getElementById("load_more").remove();
+                        else {
+                            for (var i = 0; i < cont.length; i++) {
+                                add_cont(cont[i]);
+                            }
+                        }
+                    }
+                }
+            {%  endif %}
+            } catch (e) {
+                alert(e);
             }
         }
 
-        function create_tags()
-        {
-            document.getElementById('tags_input').value = tags_arr.join(' ');
+    </script>
+
+    <script>
+
+        function get_meme(cont) {
+            var meme = document.createElement('div');
+
+            meme.className = "meme_block";
+
+            meme.id = "meme_block_" + cont['id'].toString();
+
+
+                if (cont['place']) {
+                    var place = document.createElement('div');
+                    place.className = "place";
+                    place.innerText = cont['place'];
+                    meme.append(place);
+                }
+
+                var author = document.createElement('div');
+                author.className = "author";
+                    var test = document.createElement('div');
+                    test.className = "test";
+                        var a = document.createElement('a');
+                        a.href = "/author/" + cont['author_id'];
+                            var img = document.createElement('img');
+                            img.src = cont['author_img'];
+                            img.className = "author_img";
+                        a.append(img);
+                        var a_name = document.createElement('div');
+                        a_name.className = "author_name";
+                            var aa = document.createElement('a');
+                            aa.href = "/author/" + cont['author_id'];
+                            aa.innerText = cont['author_name'];
+                        a_name.append(aa);
+                        var date = document.createElement('div');
+                        date.className = "meme_date";
+                        date.innerText = cont['date'];
+                    test.append(a);
+                    test.append(a_name);
+                    test.append(date);
+                author.append(test);
+            meme.append(author);
+
+                if(cont['note'] !== "") {
+                    var note = document.createElement('div');
+                    note.className = "note";
+                    note.innerText = cont['note'];
+                    meme.append(note);
+                }
+                var img2 = document.createElement('img');
+                img2.src = cont['meme_img'];
+                img2.className = 'meme_img';
+                meme.append(img2);
+
+                    if ({{data|tojson|safe}}['info']['is_auth']) {
+                        var likes_block = document.createElement('div');
+                        likes_block.className = "likes_block";
+
+                        if (cont['is_liked']) var liked = "like_btn_1";
+                        else var liked = "like_btn_0";
+
+                        if (cont['is_reposted']) var reposted = "repost_btn_1";
+                        else var reposted = "repost_btn_0";
+
+                            var like_img = document.createElement('img');
+                            like_img.src = "http://127.0.0.1:8080/static/img/interface/" + liked + ".png";
+                            like_img.className = "like_btn";
+                            like_img.onclick = 'post("/post", "{"type":"like", "target_id":"' + cont['id'] +
+                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage1(' + cont['id'] + ');';
+                            like_img.id = "l" + cont['id'];
+
+                        likes_block.append(like_img);
+
+                            var like_num = document.createElement('div');
+                            like_num.className = "lr_number";
+                            like_num.id = "ln" + cont['id'];
+                            like_num.innerText = cont['likes'];
+
+                        likes_block.append(like_num);
+
+                            var rep_img = document.createElement('img');
+                            rep_img.src = "http://127.0.0.1:8080/static/img/interface/" + reposted + ".png";
+                            rep_img.className = "repost_btn";
+                            rep_img.onclick = 'post("/post", "{"type":"repost", "target_id":"' + cont['id'] +
+                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage2(' + cont['id'] + ');';
+                            rep_img.id = "r" + cont['id'];
+
+                        likes_block.append(rep_img);
+
+                            var rep_num = document.createElement('div');
+                            rep_num.className = "lr_number";
+                            rep_num.id = "rn" + cont['id'];
+                            rep_num.innerText = cont['reposts'];
+
+                        likes_block.append(rep_num);
+
+                            if (cont['delete']) {
+                                var del = document.createElement('div');
+                                del.className = "delete_btn";
+                                del.onclick = 'post("/post", "{"type":"delete", "target_id":"' + cont['id'] +
+                                    '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                                del.innerText = "Удалить публикацию";
+                                likes_block.append(del)
+                            }
+                        meme.append(likes_block);
+                    }
+                    else {
+                        var not_auth = document.createElement('div');
+                        not_auth.className = "likes_block auth_note";
+                            var pls_auth = document.createElement('a');
+                            pls_auth.className = "auth_note_button";
+                            pls_auth.href = "/login";
+                            pls_auth.innerText = "Авторизуйтесь";
+                        not_auth.append(pls_auth);
+                        not_auth.innerText = ", чтобы получить возможность лайкать и репостить публикации";
+
+                        meme.append(not_auth);
+                    }
+
+                    var cat = document.createElement('div');
+                    cat.className = "category";
+                        for (let i = 0; i < cont['category'].length; i++) {
+                            var tag_search = document.createElement('a');
+                            tag_search.href = "/search/~" + cont['category'][i];
+                            if (i !== cont['category'].length - 1) tag_search.innerText = "#" + cont['category'][i] + ", ";
+                            else tag_search.innerText = "#" + cont['category'][i];
+                            cat.append(tag_search);
+                        }
+            meme.append(cat);
+
+            return meme;
         }
 
-        function clean_tags()
-        {
-            var tags_number = 0;
-            let tags_arr = [];
-            // location.reload();
+        function primary_load() {
+            let data = {{ data|tojson|safe }};
+            for (let i = 0; i < data['content'].length; i++) {
+                add_cont(data['content'][i]);
+            }
+            window.k = Number(data['k'])
+        }
+        function add_cont(cont) {
+            if (cont['type'] === "meme") {
+                meme = get_meme(cont);
+            }
+            else {
+                var meme = document.createElement('div');
+
+                meme.className = "meme_block";
+
+                meme.id = "meme_block_" + cont['id'].toString();
+
+                if (cont['place']) {
+                    var place = document.createElement('div');
+                    place.className = "place";
+                    place.innerText = cont['place'];
+                    meme.append(place);
+                }
+
+                var author = document.createElement('div');
+                author.className = "author";
+                var test = document.createElement('div');
+                test.className = "test";
+                var a = document.createElement('a');
+                a.href = "/author/" + cont['author_id'];
+                var img = document.createElement('img');
+                img.src = cont['author_img'];
+                img.className = "author_img";
+                a.append(img);
+                var a_name = document.createElement('div');
+                a_name.className = "author_name";
+                var aa = document.createElement('a');
+                aa.href = "/author/" + cont['author_id'];
+                aa.innerText = cont['author_name'];
+                a_name.append(aa);
+                var date = document.createElement('div');
+                date.className = "meme_date";
+                date.innerText = cont['date'];
+                test.append(a);
+                test.append(a_name);
+                test.append(date);
+                author.append(test);
+                meme.append(author);
+
+                var rep_meme = get_meme(cont['reposted_content']);
+                rep_meme.className = "meme_block margin_top";
+                meme.append(rep_meme);
+
+                var del = document.createElement('div');
+                del.className = "likes_block";
+                if (cont['delete']) {
+                    var del1 = document.createElement('div');
+                    del1.className = "delete_btn";
+                    del1.onclick = 'post("/post", "{"type":"delete_repost", "target_id":"' + cont['id'] + '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                    del1.innerText = "Удалить публикацию";
+                    del.append(del1);
+                }
+                meme.append(del);
+            }
+            document.getElementById("main").insertBefore(meme, document.getElementById("load_more"));
         }
 
-</script>
+    </script>
+
 {% endblock %}
+
+
+

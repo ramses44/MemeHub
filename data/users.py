@@ -37,6 +37,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                secondaryjoin=(followers.c.subscriber == id),
                                backref='author', lazy='dynamic')
     rating = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    is_blocked = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -62,6 +63,9 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                 'error_message': '',
                 'is_sub': False,
                 'is_block': False}
+
+    def __hash__(self):
+        return hash(str(self.id) + 'u')
 
     def get_info(self):
         return {'username': self.alias, 'avatar': '../../static/img/avatars/' + self.avatar, 'id': self.id}
