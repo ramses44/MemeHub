@@ -441,7 +441,7 @@
                         for (let i = 0; i < cont['category'].length; i++) {
                             var tag_search = document.createElement('a');
                             tag_search.href = "/search/~" + cont['category'][i];
-                            if (i !== cont['category'].length - 1) tag_search.innerText = "#" + cont['category'][i] + ", ";
+                            if (i !== cont['category'].length - 1) tag_search.innerText = "#" + cont['category']['i'] + ", ";
                             else tag_search.innerText = "#" + cont['category'][i];
                             cat.append(tag_search);
                         }
