@@ -15,11 +15,12 @@
                     {{ form2.note(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
                 </div>
                 <div class="pub_notes">Теги</div>
-                <select class="selectpicker" multiple="multiple" data-live-search="true" id="tags" name="tags" required>
-                    {% for id, title in form2.tags() %}
-                        <option value={{ id }}>{{ title }}</option>
+                {{ form2.tags(autocomplete="off", id="tags_input", style="display: none;") }}
+                <div class="pub_tags">
+                    {% for tag in data['user_page']['tags'] %}
+                        <div class="pub_tag" id="tag_{{ tag }}" onclick="click_tag('tag_{{ tag }}');">{{ tag }}</div>
                     {% endfor %}
-                </select> <br>
+                </div>
                 <div class="pub_btn_grp">
                     <div class="pub_choose_btn" onclick="document.getElementById('input_meme').click();">Выберете файл</div>
                     <div id="div_meme" class="pub_choose_txt"></div>
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-<script>
+    <script>
                     var verified = [];
                     document.querySelector('tags').onchange = function(e) {
                         if (this.querySelectorAll('option:checked').length <= 5) {
@@ -45,5 +46,45 @@
                             });
                         }
                     }
-                </script>
+
+
+        var tags_number = 0;
+        let tags_arr = [];
+        function click_tag(tag_id)
+        {
+            if (document.getElementById(tag_id).classList.contains('pub_pressed'))
+            {
+                document.getElementById(tag_id).classList.remove('pub_pressed');
+                tags_number--;
+                var index = tags_arr.indexOf(document.getElementById(tag_id).innerHTML);
+                if (index !== -1)
+                {
+                    tags_arr.splice(index, 1);
+                }
+                create_tags();
+            }
+            else
+            {
+                if (tags_number < 5)
+                {
+                    document.getElementById(tag_id).classList.add('pub_pressed');
+                    tags_number++;
+                    tags_arr[tags_arr.length] = document.getElementById(tag_id).innerHTML;
+                    create_tags();
+                }
+            }
+        }
+
+        function create_tags()
+        {
+            document.getElementById('tags_input').value = tags_arr.join(' ');
+        }
+
+        function clean_tags()
+        {
+            var tags_number = 0;
+            let tags_arr = [];
+            // location.reload();
+        }
+     </script>
 {% endblock %}

@@ -504,16 +504,16 @@
                 rep_meme.className = "meme_block margin_top";
                 meme.append(rep_meme);
 
-                var del = document.createElement('div');
-                del.className = "likes_block";
                 if (cont['delete']) {
+                    var del = document.createElement('div');
+                    del.className = "likes_block";
                     var del1 = document.createElement('div');
                     del1.className = "delete_btn";
-                    del1.onclick = 'post("/post", "{"type":"delete_repost", "target_id":"' + cont['id'] + '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                    del1.onclick = 'post("/post", "{"type": "repost", "target_id":"' + cont['reposted_content']['id'] + '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
                     del1.innerText = "Удалить публикацию";
                     del.append(del1);
+                    meme.append(del);
                 }
-                meme.append(del);
             }
             document.getElementById("main").insertBefore(meme, document.getElementById("load_more"));
         }
