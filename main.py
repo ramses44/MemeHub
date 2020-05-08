@@ -282,7 +282,11 @@ def post():
                 target.is_blocked = True
         elif req['type'] == 'delete_tag':  # обработка запросов на удаление тегов
             tag = req['target'][4:]
-            session.query(Tag).filter(Tag.title == tag).delete()
+            _tag_ = session.query(Tag).filter(Tag.title == tag)
+            tag_ = _tag_.first()
+            for meme in tag_.memes:
+                meme.tags.remove(tag_)
+            _tag_.delete()
         session.commit()
     return 'qwerty'
 
@@ -310,15 +314,17 @@ def user_page(username_id):
 
             # Создаём мем
             session = db_session.create_session()
+            print(form2.tags.data)
             meme = Meme(
                 title=form2.note.data,
-                tags=[session.query(Tag).filter(Tag.title == i).first() for i in form2.tags.data.split()],
+                tags=
+                [session.query(Tag).filter(Tag.title == i).first() for i in form2.tags.data.replace("#", "").split()],
                 author=current_user.get_id(),
                 picture=fn
             )
 
-            for i in meme.tags:
-                print(i.title)
+            # for i in meme.tags:
+            #     print(i.title)
 
             # Сохраняем
             session.add(meme)
@@ -477,7 +483,7 @@ def addtag():
 
     elif form.validate_on_submit():
         # Если кнопка нажата (POST-запрос)
-        sess.add(Tag(title=form.title.data))
+        sess.add(Tag(title=form.title.data.replace(" ", "_")))
         sess.commit()
         flash("Тег успешно добавлен")
         return redirect('/addtag')

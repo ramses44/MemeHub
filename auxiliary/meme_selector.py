@@ -5,11 +5,11 @@ from data.tags import Tag
 
 TOP_LEN = 5
 LIKED_MEMES_BASIS = 15
-LAST_PUBS_COUNT = 50
+LAST_PUBS_COUNT = 5
 FROM_SUBSCRIBES_COEFFICIENT = 0.5
 LAST_FROM_SUB_COUNT = int(LAST_PUBS_COUNT * FROM_SUBSCRIBES_COEFFICIENT)
 LAST_MEMES_COUNT = LAST_PUBS_COUNT - LAST_FROM_SUB_COUNT
-TAPE_SIZE = 10
+TAPE_SIZE = 5
 SORT_KEY = lambda x: x.publication_date
 
 
@@ -58,6 +58,7 @@ def get_related(tags, k):  # k - номер пробега
 
     ses = create_session()
     memes = get_from_memes(ses.query(Meme), (LAST_MEMES_COUNT * k, LAST_MEMES_COUNT * (k - 1)))
+    # print('!', memes, k)
     memes_ = {m.id: 0 for m in memes}
 
     for meme in memes:
@@ -77,7 +78,7 @@ def get_tape(uid, k=0):  # k - возвращённое ранее значен�
 
     while len(tape) < TAPE_SIZE:
         res = set(get_related(get_tags(*get_basis(uid)), k + 1) +
-                  get_pubs(*subs, bs=(LAST_FROM_SUB_COUNT * k, LAST_FROM_SUB_COUNT * (k - 1))))
+                  get_pubs(*subs, bs=(LAST_FROM_SUB_COUNT * (k + 1), LAST_FROM_SUB_COUNT * k)))
         if not res:
             break
         else:
@@ -126,9 +127,9 @@ def search(text, k=0):
         return pubs[k * LAST_PUBS_COUNT:(k + 1) * LAST_PUBS_COUNT]
 
 
-
 if __name__ == '__main__':
     global_init('../db/memehub.sqlite')
-    print(
-        get_tape(2)
-    )
+    k = 0
+    for _ in range(4):
+        t, k = get_tape(3, k)
+        print(t)

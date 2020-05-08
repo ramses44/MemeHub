@@ -99,7 +99,7 @@ def do_search(data, uid=0, k=0):
             'likes': len(list(meme.likes)),
             'reposts': len(list(meme.repostes)),
             'is_liked': uid in map(lambda x: x.id, meme.likes),
-            'is_reposted': uid in map(lambda x: x.id, meme.repostes),
+            'is_reposted': uid in map(lambda x: x.user, meme.repostes),
             'category': list(map(lambda x: x.title, meme.tags)),
             'place': popular.index(meme) + 1 if meme in popular else 0,
             'delete': uid == meme.author_.id or ses.query(User).get(uid).role != ROLES.index('user')
@@ -124,6 +124,9 @@ def do_search(data, uid=0, k=0):
 
 @blueprint.route('/user_content/<int:uid>/<int:self_uid>/<int:k>')
 def get_user_content(uid, self_uid=0, k=0):
+    uid = int(uid)
+    self_uid = int(self_uid)
+    k = int(k)
 
     ses = db_session.create_session()
     content = []
@@ -142,7 +145,7 @@ def get_user_content(uid, self_uid=0, k=0):
             'likes': len(list(meme.likes)),
             'reposts': len(list(meme.repostes)),
             'is_liked': self_uid in map(lambda x: x.id, meme.likes),
-            'is_reposted': self_uid in map(lambda x: x.id, meme.repostes),
+            'is_reposted': self_uid in map(lambda x: x.user, meme.repostes),
             'category': list(map(lambda x: x.title, meme.tags)),
             'place': popular.index(meme) + 1 if meme in popular else 0,
             'delete': self_uid == meme.author or ses.query(User).get(self_uid).role != ROLES.index('user')

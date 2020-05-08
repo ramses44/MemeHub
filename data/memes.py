@@ -16,10 +16,10 @@ class Meme(SqlAlchemyBase, SerializerMixin):
     tags = orm.relation('Tag', secondary='tags_to_memes', backref='meme', lazy='dynamic')
     likes = orm.relation('User', secondary='likes', backref='meme', lazy='dynamic')
     picture = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    repostes = orm.relation('Repost', back_populates='meme_', lazy='subquery')
+    repostes = orm.relation('Repost', back_populates='meme_', lazy='dynamic')
 
     def __repr__(self):
-        return "<Meme> " + self.title
+        return "<Meme> " + str(self.id) + " " + self.title
 
     def __eq__(self, other):
         return self.id == other.id

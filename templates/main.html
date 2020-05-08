@@ -220,13 +220,13 @@
         }
 
         function block_click() {
-            if (document.getElementById("block-button").innerHTML === "Разблокировать") {
-                document.getElementById("block-button").innerHTML = "Заблокировать";
+            if (document.getElementById("block-button").innerText === "Разблокировать") {
+                document.getElementById("block-button").innerText = "Заблокировать";
                 document.getElementById("block-button").classList.remove("block_button_true");
                 document.getElementById("block-button").classList.add("block_button_false");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unblock\"}");
             } else {
-                document.getElementById("block-button").innerHTML = "Разблокировать";
+                document.getElementById("block-button").innerText = "Разблокировать";
                 document.getElementById("block-button").classList.remove("block_button_false");
                 document.getElementById("block-button").classList.add("block_button_true");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"block\"}");
