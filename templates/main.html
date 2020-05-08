@@ -126,20 +126,6 @@
 {% block scripts %}
 
     <script>
-        var verified = [];
-        var max_tags_count = 2;
-        document.querySelector('select').onchange = function (e) {
-            if (this.querySelectorAll('option:checked').length <= max_tags_count) {
-                verified = Array.apply(null, this.querySelectorAll('option:checked'));
-            } else {
-                Array.apply(null, this.querySelectorAll('option')).forEach(function (e) {
-                    e.selected = verified.indexOf(e) > -1;
-                });
-            }
-        }
-    </script>
-
-    <script>
         function post(url, data, callback) {
             try {
                 var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
@@ -159,48 +145,50 @@
     <script>
         function changeImage1(meme_id) {
 
-            if ({{ data['user_page']['is_block'] }}) {
-                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
-                return;
+            if ({{ data|tojson|safe }}['user_page']['is_block']) {
+                alert('Ваш аккаунт заблокирован администрацией!');
             }
+            else {
 
-            if (document.getElementById("l" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
-                document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
-                document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
-                document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
-                document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
-            } else {
-                document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
-                document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
-                document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
-                document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
+                if (document.getElementById("l" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
+                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                    document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
+                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                    document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
+                } else {
+                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
+                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
+                }
             }
         }
 
         function changeImage2(meme_id) {
 
-            if ({{ data['user_page']['is_block'] }}) {
-                alert('Ваш аккаунт заблокирован администрацией! Вы не можете менять информацию в своём профиле');
-                return;
+            if ({{ data|tojson|safe }}['user_page']['is_block']) {
+                alert('Ваш аккаунт заблокирован администрацией!');
             }
+            else {
 
-            if (document.getElementById("r" + meme_id).src == "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
-                document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
-                document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
-                document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
-                document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
-            } else {
-                document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
-                document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
-                document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
-                document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) - 1;
+                if (document.getElementById("r" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
+                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                    document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
+                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                    document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
+                } else {
+                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
+                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) - 1;
+                }
             }
         }
 
         function deleteMeme(meme_id) {
 
             if ({{ data['user_page']|tojson|safe }}['is_block']) {
-                alert('Ваш аккаунт заблокирован администрацией! Вы не можете удалять никакие публикации');
+                alert('Ваш аккаунт заблокирован администрацией!');
             }
             else {
                 document.getElementById(meme_id).remove();
@@ -211,27 +199,28 @@
         function sub_click() {
 
             if ({{ data|tojson|safe }}['user_page']['is_block']) {
-                alert('Ваш аккаунт заблокирован администрацией! Вы не можете взаимодействовать с другими пользователями');
-                return;
+                alert('Ваш аккаунт заблокирован администрацией!');
             }
+            else {
 
-            if (document.getElementById("sub-button").innerHTML == "Вы подписаны") {
-                document.getElementById("sub-button").innerHTML = "Подписаться";
-                document.getElementById("sub-button").classList.remove("sub_button_true");
-                document.getElementById("sub-button").classList.add("sub_button_false");
-                document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) - 1;
-                post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
-            } else {
-                document.getElementById("sub-button").innerHTML = "Вы подписаны";
-                document.getElementById("sub-button").classList.remove("sub_button_false");
-                document.getElementById("sub-button").classList.add("sub_button_true");
-                document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) + 1;
-                post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"sub\"}");
+                if (document.getElementById("sub-button").innerText === "Вы подписаны") {
+                    document.getElementById("sub-button").innerText = "Подписаться";
+                    document.getElementById("sub-button").classList.remove("sub_button_true");
+                    document.getElementById("sub-button").classList.add("sub_button_false");
+                    document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) - 1;
+                    post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"unsub\"}");
+                } else {
+                    document.getElementById("sub-button").innerText = "Вы подписаны";
+                    document.getElementById("sub-button").classList.remove("sub_button_false");
+                    document.getElementById("sub-button").classList.add("sub_button_true");
+                    document.getElementById("subs-number").innerHTML = parseInt(document.getElementById("subs-number").innerHTML) + 1;
+                    post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"sub\"}");
+                }
             }
         }
 
         function block_click() {
-            if (document.getElementById("block-button").innerHTML == "Разблокировать") {
+            if (document.getElementById("block-button").innerHTML === "Разблокировать") {
                 document.getElementById("block-button").innerHTML = "Заблокировать";
                 document.getElementById("block-button").classList.remove("block_button_true");
                 document.getElementById("block-button").classList.add("block_button_false");
@@ -375,17 +364,20 @@
                         var likes_block = document.createElement('div');
                         likes_block.className = "likes_block";
 
-                        if (cont['is_liked']) var liked = "like_btn_1";
-                        else var liked = "like_btn_0";
+                        var liked, reposted;
+                        if (cont['is_liked']) liked = "like_btn_1";
+                        else liked = "like_btn_0";
 
-                        if (cont['is_reposted']) var reposted = "repost_btn_1";
-                        else var reposted = "repost_btn_0";
+                        if (cont['is_reposted']) reposted = "repost_btn_1";
+                        else reposted = "repost_btn_0";
 
                             var like_img = document.createElement('img');
                             like_img.src = "http://127.0.0.1:8080/static/img/interface/" + liked + ".png";
                             like_img.className = "like_btn";
-                            like_img.onclick = 'post("/post", "{"type":"like", "target_id":"' + cont['id'] +
-                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage1(' + cont['id'] + ');';
+                            like_img.onclick = function() {
+                                post("/post", `{\"type\":\"like\", \"target_id\":\"${cont['id']}\", \"user_id\":\"{{ data["info"]["id"] }}\"}`);
+                                changeImage1(cont['id']);
+                            }
                             like_img.id = "l" + cont['id'];
 
                         likes_block.append(like_img);
@@ -400,8 +392,10 @@
                             var rep_img = document.createElement('img');
                             rep_img.src = "http://127.0.0.1:8080/static/img/interface/" + reposted + ".png";
                             rep_img.className = "repost_btn";
-                            rep_img.onclick = 'post("/post", "{"type":"repost", "target_id":"' + cont['id'] +
-                                '", "user_id":"{{ data["info"]["id"] }}"}"); changeImage2(' + cont['id'] + ');';
+                            rep_img.onclick = function() {
+                                post("/post", `{"type":"repost", "target_id":"${cont['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
+                                changeImage2(cont['id']);
+                            }
                             rep_img.id = "r" + cont['id'];
 
                         likes_block.append(rep_img);
@@ -416,8 +410,10 @@
                             if (cont['delete']) {
                                 var del = document.createElement('div');
                                 del.className = "delete_btn";
-                                del.onclick = 'post("/post", "{"type":"delete", "target_id":"' + cont['id'] +
-                                    '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                                del.onclick = function() {
+                                    post("/post", `{"type":"delete", "target_id":"${cont['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
+                                    deleteMeme(`meme_block_${cont['id']}`);
+                                }
                                 del.innerText = "Удалить публикацию";
                                 likes_block.append(del)
                             }
@@ -431,7 +427,9 @@
                             pls_auth.href = "/login";
                             pls_auth.innerText = "Авторизуйтесь";
                         not_auth.append(pls_auth);
-                        not_auth.innerText = ", чтобы получить возможность лайкать и репостить публикации";
+                            var txt = document.createElement('a');
+                            txt.innerText = ", чтобы получить возможность лайкать и репостить публикации";
+                        not_auth.append(txt)
 
                         meme.append(not_auth);
                     }
@@ -441,7 +439,7 @@
                         for (let i = 0; i < cont['category'].length; i++) {
                             var tag_search = document.createElement('a');
                             tag_search.href = "/search/~" + cont['category'][i];
-                            if (i !== cont['category'].length - 1) tag_search.innerText = "#" + cont['category']['i'] + ", ";
+                            if (i !== cont['category'].length - 1) tag_search.innerText = "#" + cont['category'][i] + ", ";
                             else tag_search.innerText = "#" + cont['category'][i];
                             cat.append(tag_search);
                         }
@@ -452,6 +450,7 @@
 
         function primary_load() {
             let data = {{ data|tojson|safe }};
+            if (data['type'] === 'top') document.getElementById("load_more").remove();
             for (let i = 0; i < data['content'].length; i++) {
                 add_cont(data['content'][i]);
             }
@@ -509,7 +508,10 @@
                     del.className = "likes_block";
                     var del1 = document.createElement('div');
                     del1.className = "delete_btn";
-                    del1.onclick = 'post("/post", "{"type": "repost", "target_id":"' + cont['reposted_content']['id'] + '", "user_id":"{{ data["info"]["id"] }}"}"); deleteMeme("meme_block_' + cont['id'] + '")';
+                    del1.onclick = function() {
+                        post("/post", `{"type": "repost", "target_id":"${cont['reposted_content']['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
+                        deleteMeme(`meme_block_${cont['id']}`);
+                    }
                     del1.innerText = "Удалить публикацию";
                     del.append(del1);
                     meme.append(del);

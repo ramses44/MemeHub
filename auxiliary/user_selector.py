@@ -36,7 +36,7 @@ def calculate_rating(uid):
     rating = likes + subs * 2 + liked * 0.25 + repostes * 3
     rating = rating * ACTIVITY_COEFFICIENT if is_active(uid) else rating
 
-    return rating
+    return round(rating)
 
 
 def gen_user_info(uid, self_uid=0):
