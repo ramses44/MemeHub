@@ -3,11 +3,22 @@
 
     {% for user in data['content'] %}
         <div class="meme_block">
+            <style type="text/css">
+                .img_sub_block {
+                    height: 200px;
+                }
+
+                .head_block {
+                    height: 200px;
+                }
+            </style>
         <div class="head_block">
             <div class="img_sub_block">
                 <div class="img_block">
                     <img src="{{ user['user_img'] }}" class="up_img_other">
                 </div>
+                                <!--
+                {% if user['type'] != 'me' %}
                 <div class="sub_block">
                     {% if user['type'] != 'me' %}
                         {% if user['is_sub'] %}
@@ -31,6 +42,8 @@
                         </style>
                     {% endif %}
                 </div>
+                {% endif %}
+                -->
             </div>
             <div class="username_block">
                 <div class="up_role">

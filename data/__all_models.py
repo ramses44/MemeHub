@@ -62,7 +62,8 @@ class MemePublishForm(FlaskForm):
     img = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!'), DataRequired()])
     submit = SubmitField("Опубликовать")
 
-    # @staticmethod
-    # def tags():
-    #     ses = create_session()
-    #     return map(lambda x: (x.id, x.title), ses.query(tags.Tag).all())
+
+class FeedbackForm(FlaskForm):
+    subject = StringField()
+    data = StringField()
+    submit = SubmitField("Отправить")

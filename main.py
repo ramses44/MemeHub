@@ -15,6 +15,8 @@ from datetime import datetime
 from gen_api import *
 import time
 from threading import Thread
+import os
+import json
 
 ROLES = ['user', 'moder', 'admin']
 REFRESH_PERIOD = 12
@@ -95,7 +97,7 @@ def gen_data(do_get_content=True):
         else:
             res = get_content().json
     else:
-        res = {}
+        res = {'content': []}
 
     res['user_page'] = dict(is_page=False)
     res['info'] = info  # Совмещаем данные в один словарь
@@ -235,10 +237,10 @@ def post():
         elif req['type'] == 'repost':  # обработка репостов
             user = session.query(User).filter(User.id == req['user_id']).first()
             target = session.query(Meme).filter(Meme.id == req['target_id']).first()
+            print('repost-test')
             if target in [session.query(Meme).filter(Meme.id == r.meme).first() for r in user.repostes]:
                 # если репост уже был
-                print('remove')
-                repost = session.query(Repost).filter(Repost.meme == target.id).first()
+                repost = session.query(Repost).filter(Repost.meme == target.id, Repost.user == user.id).first()
                 user.repostes.remove(repost)
                 target.repostes.remove(repost)
                 session.query(Repost).filter(Repost.id == repost.id).delete()
@@ -287,6 +289,11 @@ def post():
             for meme in tag_.memes:
                 meme.tags.remove(tag_)
             _tag_.delete()
+        elif req['type'] == 'checked_feedback':  # обработка просмотренных/решённых обращений
+            try:
+                os.remove(f'./feedbacks/{req["target"]}')
+            except FileNotFoundError:
+                pass
         session.commit()
     return 'qwerty'
 
@@ -485,7 +492,6 @@ def addtag():
         # Если кнопка нажата (POST-запрос)
         sess.add(Tag(title=form.title.data.replace(" ", "_")))
         sess.commit()
-        flash("Тег успешно добавлен")
         return redirect('/addtag')
 
     else:
@@ -514,5 +520,57 @@ def get_my_profile():
         return redirect(f'/author/{current_user.get_id()}')
 
 
+@app.route('/feedback', methods=['POST', 'GET'])
+def feedback():
+    """Обратная связь"""
+
+    if not current_user.is_authenticated:
+        # Если пользователь не вошёл в систему, кидаем ошибку
+        abort(401, message="Пожалуйста, авторизуйтесь!")
+
+    form = FeedbackForm()
+
+    if form.validate_on_submit():
+        # Если отправлен запрос
+        ses = db_session.create_session()
+        user = ses.query(User).get(current_user.get_id())
+
+        with open('./feedbacks/' + str(datetime.now()).replace(":", "_").replace(" ", "_") + '.json', 'w', encoding='utf-8') as fb:
+            print(json.dumps({
+                'subject': form.subject.data,
+                'sender': dict(id=user.id, alias=user.alias,
+                               user_img=url_for('static', filename=f'img/avatars/{user.avatar}')),
+                'data': form.data.data}), file=fb)
+        return redirect('/')
+    return render_template('feedback.html', title='Обратная связь', form=form,
+                           current_user=current_user, data=gen_data(do_get_content=False))
+
+
+@app.route('/check_feedback', methods=['GET', 'POST'])
+def check_feedback():
+    """для админов, чтение сообщений пользователей"""
+
+    if not current_user.is_authenticated:
+        # Если пользователь не вошёл в систему, кидаем ошибку
+        abort(401, message="Пожалуйста, авторизуйтесь!")
+
+    ses = db_session.create_session()
+
+    if ROLES[ses.query(User).get(current_user.get_id()).role] != 'admin':
+        # Если пользователь не админ, кидаем ошибку
+        abort(423, message="Только администратор может читать фидбэки")
+
+    data = gen_data(do_get_content=False)
+
+    for elem in os.listdir('feedbacks'):
+        with open(f'./feedbacks/{elem}') as fb:
+            data['content'].append(json.loads(fb.read()))
+            data['content'][-1]['title'] = elem
+
+    return render_template('check_feedback.html', title='Обратная связь', current_user=current_user, data=data)
+
+
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    # app.run(port=8080, host='127.0.0.1')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

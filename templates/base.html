@@ -9,9 +9,6 @@
         <link rel="stylesheet" type="text/css" href="../../static/css/user_page_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/publish_css.css">
         <link rel="stylesheet" type="text/css" href="../../static/css/subscribes_css.css">
-        <!--
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-        -->
         <title>{{ title }}</title>
     </head>
     <body class="bg_style"
@@ -59,6 +56,13 @@
                     <div class="menu_block menu_block1">
                         <div class="menu_section" onClick="window.location='/addtag'">Редактировать теги</div>
                     </div>
+                    <div class="menu_block menu_block1">
+                        <div class="menu_section" onClick="window.location='/check_feedback'">Обратная связь</div>
+                    </div>
+                {% elif data['info']['is_auth'] %}
+                    <div class="menu_block menu_block1">
+                        <div class="menu_section" onClick="window.location='/feedback'">Обратная связь</div>
+                    </div>
                 {% endif %}
             </div>
             <div class="center_block">
@@ -81,5 +85,21 @@
     }
     }
 </script>
+<script>
+        function post(url, data, callback) {
+            try {
+                var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                req.open('POST', url, 1);
+                req.setRequestHeader('Content-type', 'application/json');
+                req.send(data)
+            } catch (e) {
+                window.console && console.log(e);
+            }
+        }
+
+        function reload() {
+            window.location.reload()
+        }
+    </script>
 
 {% block scripts %}{% endblock %}

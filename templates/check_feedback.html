@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="publish_block">
+    {% for feedback in data['content'] %}
+        <div class="meme_block" id="{{ feedback['title'] }}">
+            <div class="author">
+                <div class="test">
+                <a href="/author/{{ feedback['sender']['id'] }}">
+                    <img class="author_img" src="{{ feedback['sender']['user_img'] }}">
+                </a>
+                <div class="author_name">
+                    <a href="/author/{{ feedback['sender']['id'] }}">{{ feedback['sender']['alias'] }}</a>
+                </div>
+                <div class="meme_date">{{ feedback['title'][:10] }}</div>
+            </div>
+            </div>
+        <div class="meme_block">
+            <div class="author_name"> Тема: {{ feedback['subject'] }} </div>
+        </div>
+        <div class="meme_block">
+            <div class="author_name">Содержание: {{ feedback['data'] }}</div>
+        </div>
+        <div class="author">
+            <div class="sub_button block_button_false" onclick="solved('{{ feedback['title'] }}')">Решено</div>
+        </div>
+        </div>
+    {% endfor %}
+    </div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+        function solved(elem_id) {
+            document.getElementById(elem_id).remove();
+            post('/post', `{"type": "checked_feedback", "target": "${elem_id}"}`);
+        }
+    </script>
+
+{% endblock %}

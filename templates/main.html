@@ -11,6 +11,17 @@
                 {% if data['user_page']['error_message'] %}
                     <div class="error_message">{{ data['user_page']['error_message'] }}</div>
                 {% endif %}
+                {% if data['user_page']['type'] == 'me' %}
+                        <style type="text/css">
+                            .img_sub_block {
+                                height: 200px;
+                            }
+
+                            .head_block {
+                                height: 200px;
+                            }
+                        </style>
+                {% endif %}
                 <div class="head_block">
                     <div class="img_sub_block">
                         <div class="img_block">
@@ -23,6 +34,7 @@
                                 <img src="{{ data['user_page']['user_img'] }}" class="up_img_other">
                             {% endif %}
                         </div>
+                        {% if data['user_page']['type'] != 'me' %}
                         <div class="sub_block">
                             {% if data['user_page']['type'] != 'me' %}
                                 {% if data['user_page']['is_sub'] %}
@@ -61,6 +73,7 @@
                                 </style>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                     <div class="username_block">
                         <div class="up_role">
@@ -125,22 +138,7 @@
 
 {% block scripts %}
 
-    <script>
-        function post(url, data, callback) {
-            try {
-                var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
-                req.open('POST', url, 1);
-                req.setRequestHeader('Content-type', 'application/json');
-                req.send(data)
-            } catch (e) {
-                window.console && console.log(e);
-            }
-        }
 
-        function reload() {
-            window.location.reload()
-        }
-    </script>
 
     <script>
         function changeImage1(meme_id) {
@@ -150,15 +148,15 @@
             }
             else {
 
-                if (document.getElementById("l" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
-                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                if (document.getElementById("l" + meme_id).src.substr(-14, 14) === "like_btn_0.png") {
+                    document.getElementById("l" + meme_id).src = "../../static/img/interface/like_btn_1.png";
                     document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
-                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                    document.getElementById("l" + meme_id + "_r").src = "../../static/img/interface/like_btn_1.png";
                     document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
                 } else {
-                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("l" + meme_id).src = "../../static/img/interface/like_btn_0.png";
                     document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
-                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("l" + meme_id + "_r").src = "../../static/img/interface/like_btn_0.png";
                     document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
                 }
             }
@@ -171,15 +169,15 @@
             }
             else {
 
-                if (document.getElementById("r" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
-                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                if (document.getElementById("r" + meme_id).src.substr(-16, 16) === "repost_btn_0.png") {
+                    document.getElementById("r" + meme_id).src = "../../static/img/interface/repost_btn_1.png";
                     document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
-                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                    document.getElementById("r" + meme_id + "_r").src = "../../static/img/interface/repost_btn_1.png";
                     document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
                 } else {
-                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("r" + meme_id).src = "../../static/img/interface/repost_btn_0.png";
                     document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
-                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("r" + meme_id + "_r").src = "../../static/img/interface/repost_btn_0.png";
                     document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) - 1;
                 }
             }
@@ -372,7 +370,7 @@
                         else reposted = "repost_btn_0";
 
                             var like_img = document.createElement('img');
-                            like_img.src = "http://127.0.0.1:8080/static/img/interface/" + liked + ".png";
+                            like_img.src = "../../static/img/interface/" + liked + ".png";
                             like_img.className = "like_btn";
                             like_img.onclick = function() {
                                 post("/post", `{\"type\":\"like\", \"target_id\":\"${cont['id']}\", \"user_id\":\"{{ data["info"]["id"] }}\"}`);
@@ -390,7 +388,7 @@
                         likes_block.append(like_num);
 
                             var rep_img = document.createElement('img');
-                            rep_img.src = "http://127.0.0.1:8080/static/img/interface/" + reposted + ".png";
+                            rep_img.src = "../../static/img/interface/" + reposted + ".png";
                             rep_img.className = "repost_btn";
                             rep_img.onclick = function() {
                                 post("/post", `{"type":"repost", "target_id":"${cont['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
@@ -422,14 +420,15 @@
                     else {
                         var not_auth = document.createElement('div');
                         not_auth.className = "likes_block auth_note";
-                            var pls_auth = document.createElement('a');
-                            pls_auth.className = "auth_note_button";
-                            pls_auth.href = "/login";
-                            pls_auth.innerText = "Авторизуйтесь";
+                        var pls_auth = document.createElement('a');
+                        pls_auth.className = "auth_note_button";
+                        pls_auth.href = "/login";
+                        pls_auth.innerText = "Авторизуйтесь";
                         not_auth.append(pls_auth);
                             var txt = document.createElement('a');
                             txt.innerText = ", чтобы получить возможность лайкать и репостить публикации";
                         not_auth.append(txt)
+
 
                         meme.append(not_auth);
                     }
@@ -510,7 +509,7 @@
                     del1.className = "delete_btn";
                     del1.onclick = function() {
                         post("/post", `{"type": "repost", "target_id":"${cont['reposted_content']['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
-                        deleteMeme(`meme_block_${cont['id']}`);
+                        document.getElementById(`meme_block_${cont['id']}`).remove();
                     }
                     del1.innerText = "Удалить публикацию";
                     del.append(del1);
@@ -523,6 +522,3 @@
     </script>
 
 {% endblock %}
-
-
-
