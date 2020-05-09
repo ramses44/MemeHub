@@ -15,6 +15,7 @@ from datetime import datetime
 from gen_api import *
 import time
 from threading import Thread
+import os
 
 ROLES = ['user', 'moder', 'admin']
 REFRESH_PERIOD = 12
@@ -515,4 +516,6 @@ def get_my_profile():
 
 
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    # app.run(port=8080, host='127.0.0.1')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
