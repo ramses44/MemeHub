@@ -524,8 +524,7 @@
                     del1.className = "delete_btn";
                     del1.onclick = function() {
                         post("/post", `{"type": "repost", "target_id":"${cont['reposted_content']['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
-                        // deleteMeme(`meme_block_${cont['id']}`);
-                        document.getElementById(cont['id']).remove();
+                        document.getElementById(`meme_block_${cont['id']}`).remove();
                     }
                     del1.innerText = "Удалить публикацию";
                     del.append(del1);
