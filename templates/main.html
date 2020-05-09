@@ -163,15 +163,15 @@
             }
             else {
 
-                if (document.getElementById("l" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/like_btn_0.png") {
-                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                if (document.getElementById("l" + meme_id).src === "../../static/img/interface/like_btn_0.png") {
+                    document.getElementById("l" + meme_id).src = "../../static/img/interface/like_btn_1.png";
                     document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
-                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_1.png";
+                    document.getElementById("l" + meme_id + "_r").src = "../../static/img/interface/like_btn_1.png";
                     document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) + 1;
                 } else {
-                    document.getElementById("l" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("l" + meme_id).src = "../../static/img/interface/like_btn_0.png";
                     document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) - 1;
-                    document.getElementById("l" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/like_btn_0.png";
+                    document.getElementById("l" + meme_id + "_r").src = "../../static/img/interface/like_btn_0.png";
                     document.getElementById("ln" + meme_id + "_r").innerHTML = parseInt(document.getElementById("ln" + meme_id + "_r").innerHTML) - 1;
                 }
             }
@@ -184,15 +184,15 @@
             }
             else {
 
-                if (document.getElementById("r" + meme_id).src === "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png") {
-                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                if (document.getElementById("r" + meme_id).src === "../../static/img/interface/repost_btn_0.png") {
+                    document.getElementById("r" + meme_id).src = "../../static/img/interface/repost_btn_1.png";
                     document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
-                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_1.png";
+                    document.getElementById("r" + meme_id + "_r").src = "../../static/img/interface/repost_btn_1.png";
                     document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) + 1;
                 } else {
-                    document.getElementById("r" + meme_id).src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("r" + meme_id).src = "../../static/img/interface/repost_btn_0.png";
                     document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) - 1;
-                    document.getElementById("r" + meme_id + "_r").src = "http://127.0.0.1:8080/static/img/interface/repost_btn_0.png";
+                    document.getElementById("r" + meme_id + "_r").src = "../../static/img/interface/repost_btn_0.png";
                     document.getElementById("rn" + meme_id + "_r").innerHTML = parseInt(document.getElementById("rn" + meme_id + "_r").innerHTML) - 1;
                 }
             }
@@ -385,7 +385,7 @@
                         else reposted = "repost_btn_0";
 
                             var like_img = document.createElement('img');
-                            like_img.src = "http://127.0.0.1:8080/static/img/interface/" + liked + ".png";
+                            like_img.src = "../../static/img/interface/" + liked + ".png";
                             like_img.className = "like_btn";
                             like_img.onclick = function() {
                                 post("/post", `{\"type\":\"like\", \"target_id\":\"${cont['id']}\", \"user_id\":\"{{ data["info"]["id"] }}\"}`);
@@ -403,7 +403,7 @@
                         likes_block.append(like_num);
 
                             var rep_img = document.createElement('img');
-                            rep_img.src = "http://127.0.0.1:8080/static/img/interface/" + reposted + ".png";
+                            rep_img.src = "../../static/img/interface/" + reposted + ".png";
                             rep_img.className = "repost_btn";
                             rep_img.onclick = function() {
                                 post("/post", `{"type":"repost", "target_id":"${cont['id']}", "user_id":"{{ data["info"]["id"] }}"}`);
@@ -538,6 +538,3 @@
     </script>
 
 {% endblock %}
-
-
-
