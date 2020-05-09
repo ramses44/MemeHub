@@ -163,7 +163,7 @@
             }
             else {
 
-                if (document.getElementById("l" + meme_id).src === "../../static/img/interface/like_btn_0.png") {
+                if (document.getElementById("l" + meme_id).src.substr(-14, 14) === "like_btn_0.png") {
                     document.getElementById("l" + meme_id).src = "../../static/img/interface/like_btn_1.png";
                     document.getElementById("ln" + meme_id).innerHTML = parseInt(document.getElementById("ln" + meme_id).innerHTML) + 1;
                     document.getElementById("l" + meme_id + "_r").src = "../../static/img/interface/like_btn_1.png";
@@ -184,7 +184,7 @@
             }
             else {
 
-                if (document.getElementById("r" + meme_id).src === "../../static/img/interface/repost_btn_0.png") {
+                if (document.getElementById("r" + meme_id).src.substr(-16, 16) === "repost_btn_0.png") {
                     document.getElementById("r" + meme_id).src = "../../static/img/interface/repost_btn_1.png";
                     document.getElementById("rn" + meme_id).innerHTML = parseInt(document.getElementById("rn" + meme_id).innerHTML) + 1;
                     document.getElementById("r" + meme_id + "_r").src = "../../static/img/interface/repost_btn_1.png";
