@@ -57,6 +57,17 @@
                                          onclick="block_click()">Заблокировать
                                     </div>
                                 {% endif %}
+
+                                {% if data['user_page']['role'] == 'moder' %}
+                                    <div class="sub_button block_button_true" id="role-button" onclick="role_click()">
+                                        Модератор
+                                    </div>
+                                {% else %}
+                                    <div class="sub_button block_button_false" id="role-button"
+                                         onclick="role_click()">
+                                         Сделать модератором
+                                    </div>
+                                {% endif %}
                             {% endif %}
                             {% if data['user_page']['type'] == 'me' or data['info']['role'] != 'admin' %}
                                 <style type="text/css">
@@ -69,6 +80,20 @@
                                 <style type="text/css">
                                     .head_block {
                                         height: 200px;
+                                    }
+                                </style>
+                            {% endif %}
+                            {% if data['user_page']['type'] != 'me' and data['info']['role'] == 'admin' and data['user_page']['role'] != 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 308px;
+                                    }
+                                </style>
+                            {% endif %}
+                            {% if data['user_page']['type'] != 'me' and data['user_page']['role'] == 'admin' %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 235px;
                                     }
                                 </style>
                             {% endif %}
@@ -229,6 +254,21 @@
                 document.getElementById("block-button").classList.add("block_button_true");
                 post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"block\"}");
             }
+        }
+
+        function role_click() {
+            if (document.getElementById("role-button").innerText === "Модератор") {
+                document.getElementById("role-button").innerText = "Сделать модератором";
+                document.getElementById("role-button").classList.remove("block_button_true");
+                document.getElementById("role-button").classList.add("block_button_false");
+                post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"role\"}");
+            } else {
+                document.getElementById("role-button").innerText = "Модератор";
+                document.getElementById("role-button").classList.remove("block_button_false");
+                document.getElementById("role-button").classList.add("block_button_true");
+                post("/post", "{\"target_id\":\"{{ data["user_page"]["user_id"] }}\", \"user_id\":\"{{ data["info"]["id"] }}\", \"type\":\"role\"}");
+            }
+            location.reload();
         }
 
         var input = document.getElementById('input_meme');
