@@ -11,7 +11,7 @@
 
             <div class="pub_notes">Тема</div>
             <div class="pub_input_div">
-                {{ form.subject(class="pub_input") }}
+                {{ form.subject(class="pub_input", maxlength=50) }}
             </div>
             {% for error in form.subject.errors %}
                 <div class="pub_error_note">{{ error }}</div>
@@ -19,7 +19,7 @@
 
             <div class="pub_notes">Содержание</div>
             <div class="pub_input_div">
-                {{ form.data(rows=5, autocomplete="off", maxlength=80, class="pub_input") }}
+                {{ form.data(rows=5, autocomplete="off", maxlength=50, class="pub_input") }}
             </div>
             {% for error in form.data.errors %}
                 <div class="pub_error_note">{{ error }}</div>

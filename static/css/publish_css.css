@@ -211,18 +211,15 @@ img[src=""] {
 }
 
 .feedback_block {
-    margin-left: 18px;
     margin-bottom: 10px;
 }
 
 .feedback_btn {
-    margin-left: 18px;
     margin-bottom: 18px;
 }
 
 .feedback_author {
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: -12px;
     margin-top: 5px;
 }
 

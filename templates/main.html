@@ -36,7 +36,7 @@
                         </div>
                         {% if data['user_page']['type'] != 'me' %}
                         <div class="sub_block">
-                            {% if data['user_page']['type'] != 'me' %}
+                            {% if data['user_page']['type'] != 'me' and data['user_page']['current_user_auth'] %}
                                 {% if data['user_page']['is_sub'] %}
                                     <div class="sub_button sub_button_true" id="sub-button" onclick="sub_click()">Вы
                                         подписаны
@@ -94,6 +94,13 @@
                                 <style type="text/css">
                                     .head_block {
                                         height: 235px;
+                                    }
+                                </style>
+                            {% endif %}
+                            {% if not data['user_page']['current_user_auth'] %}
+                                <style type="text/css">
+                                    .head_block {
+                                        height: 200px;
                                     }
                                 </style>
                             {% endif %}

@@ -132,6 +132,10 @@ def get_user_page_data(username_id):
         data['top'] = list(session.query(User).order_by(User.rating))[::-1].index(user) + 1
     except ValueError:
         data['top'] = 0
+    if current_user.is_authenticated:
+        data['current_user_auth'] = True
+    else:
+        data['current_user_auth'] = False
     return data
 
 
@@ -146,7 +150,10 @@ def top_memes():
     """Топ мемов"""
 
     top = meme_selector.get_most_popular()
-    content = get_content(uid=current_user.get_id(), data=top).json['content']
+    if current_user.is_authenticated:
+        content = get_content(uid=current_user.get_id(), data=top).json['content']
+    else:
+        content = get_content(data=top).json['content']
 
     res = gen_data(do_get_content=False)
     res['load_more'] = False
