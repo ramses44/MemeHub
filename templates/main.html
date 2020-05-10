@@ -138,22 +138,7 @@
 
 {% block scripts %}
 
-    <script>
-        function post(url, data, callback) {
-            try {
-                var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
-                req.open('POST', url, 1);
-                req.setRequestHeader('Content-type', 'application/json');
-                req.send(data)
-            } catch (e) {
-                window.console && console.log(e);
-            }
-        }
 
-        function reload() {
-            window.location.reload()
-        }
-    </script>
 
     <script>
         function changeImage1(meme_id) {

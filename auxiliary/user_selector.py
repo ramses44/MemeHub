@@ -56,7 +56,7 @@ def gen_user_info(uid, self_uid=0):
         'subs': len(list(user.subscribers)),
         'posts': len(list(user.memes)) + len(list(user.repostes)),
         'rating': user.rating,
-        'top': users.index(user) + 1 if user in users else 0,
+        'top': users.index(user) + 1 if user in users else '-',
         'username': user.alias,
         'user_id': uid,
         'error_message': '',
