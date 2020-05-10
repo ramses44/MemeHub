@@ -185,7 +185,10 @@ def search(text):
     """Ф-ия для реализации поиска по публикациям (тегам)"""
 
     data = gen_data(do_get_content=False)
-    data['content'] = do_search(text, int(current_user.get_id())).json['content']
+    if current_user.is_authenticated:
+        data['content'] = do_search(text, int(current_user.get_id())).json['content']
+    else:
+        data['content'] = do_search(text, 0).json['content']
     data['type'] = 'search'
     data['search'] = text
 
@@ -584,6 +587,6 @@ def check_feedback():
 
 
 if __name__ == '__main__':
-    # app.run(port=8080, host='127.0.0.1')
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(port=8080, host='127.0.0.1')
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host='0.0.0.0', port=port)
